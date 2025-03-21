@@ -15,7 +15,7 @@ const Navbar = () => {
           </RouterLink>
           
           <div className="hidden md:flex space-x-6">
-            <NavLink to="/inventory" icon={<Package />} text="Inventory" />
+            <NavLink to="/inventory-dash" icon={<Package />} text="Inventory" />
             <NavLink to="/shopping-list" icon={<ShoppingCart />} text="Shopping List" />
             <NavLink to="/users" icon={<Users />} text="Users" />
             <NavLink to="/waste-tracking" icon={<Trash2 />} text="Waste Tracking" />
