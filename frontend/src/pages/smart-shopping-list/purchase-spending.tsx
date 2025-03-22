@@ -151,7 +151,7 @@ function pushaseSpending() {
               <h3 className="text-lg font-medium">Total Spending</h3>
               <BarChart3 className="w-5 h-5 text-indigo-600" />
             </div>
-            <p className="text-3xl font-bold">$89,000</p>
+            <p className="text-3xl font-bold">LKR 89,000</p>
             <p className="text-sm text-gray-600">Last 6 months</p>
           </div>
           
@@ -170,7 +170,7 @@ function pushaseSpending() {
               <BarChart3 className="w-5 h-5 text-indigo-600" />
             </div>
             <p className="text-3xl font-bold">Premium Linens</p>
-            <p className="text-sm text-gray-600">$3,200 this month</p>
+            <p className="text-sm text-gray-600">LKR 3,200 this month</p>
           </div>
         </div>
 

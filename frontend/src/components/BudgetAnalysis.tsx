@@ -1,6 +1,6 @@
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { DollarSign, TrendingDown, TrendingUp } from 'lucide-react';
+import { DollarSign, RulerIcon, TrendingDown, TrendingUp } from 'lucide-react';
 
 interface BudgetData {
   month: string;
@@ -21,18 +21,18 @@ export const BudgetAnalysis: React.FC<BudgetAnalysisProps> = ({ data }) => {
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
       <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-        <DollarSign className="w-6 h-6 text-indigo-600" />
+        <RulerIcon className="w-6 h-6 text-indigo-600" />
         Budget Analysis
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-gray-50 rounded-lg p-4">
           <p className="text-sm text-gray-600">Total Budget</p>
-          <p className="text-2xl font-bold">${totalBudget.toLocaleString()}</p>
+          <p className="text-2xl font-bold">LKR {totalBudget.toLocaleString()}</p>
         </div>
         <div className="bg-gray-50 rounded-lg p-4">
           <p className="text-sm text-gray-600">Total Spent</p>
-          <p className="text-2xl font-bold">${totalSpent.toLocaleString()}</p>
+          <p className="text-2xl font-bold">LKR {totalSpent.toLocaleString()}</p>
         </div>
         <div className={`rounded-lg p-4 ${isOverBudget ? 'bg-red-50' : 'bg-green-50'}`}>
           <p className="text-sm text-gray-600">Variance</p>
@@ -43,7 +43,7 @@ export const BudgetAnalysis: React.FC<BudgetAnalysisProps> = ({ data }) => {
               <TrendingDown className="w-5 h-5 text-green-500" />
             )}
             <p className={`text-2xl font-bold ${isOverBudget ? 'text-red-600' : 'text-green-600'}`}>
-              ${Math.abs(variance).toLocaleString()}
+              LKR {Math.abs(variance).toLocaleString()}
             </p>
           </div>
         </div>

@@ -46,8 +46,8 @@ export const PurchasePatterns: React.FC<PurchasePatternsProps> = ({ categoryTren
                 {categoryTrends.map((trend, index) => (
                   <tr key={index} className="border-b">
                     <td className="px-4 py-2">{trend.category}</td>
-                    <td className="px-4 py-2 text-right">${trend.current.toLocaleString()}</td>
-                    <td className="px-4 py-2 text-right">${trend.previous.toLocaleString()}</td>
+                    <td className="px-4 py-2 text-right">LKR {trend.current.toLocaleString()}</td>
+                    <td className="px-4 py-2 text-right">LKR {trend.previous.toLocaleString()}</td>
                     <td className={`px-4 py-2 text-right ${trend.change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                       {trend.change >= 0 ? '+' : ''}{trend.change}%
                     </td>

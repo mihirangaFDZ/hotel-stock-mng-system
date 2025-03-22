@@ -273,8 +273,8 @@ function reports() {
                 data={purchasePatterns}
                 cx={250}
                 cy={150}
-                innerRadius={60}
-                outerRadius={120}
+                innerRadius={20}
+                outerRadius={70}
                 fill="#8884d8"
                 dataKey="purchases"
                 label
@@ -295,14 +295,14 @@ function reports() {
               <div className="border rounded-lg p-4">
                 <p className="text-sm text-gray-500">Total Budget</p>
                 <p className="text-2xl font-bold">
-                  ${budgetData.reduce((sum, item) => sum + item.budget, 0).toLocaleString()}
+                  LKR {budgetData.reduce((sum, item) => sum + item.budget, 0).toLocaleString()}
                 </p>
                 <p className="text-sm text-green-600">+5.3% from last period</p>
               </div>
               <div className="border rounded-lg p-4">
                 <p className="text-sm text-gray-500">Total Spent</p>
                 <p className="text-2xl font-bold">
-                  ${budgetData.reduce((sum, item) => sum + item.spent, 0).toLocaleString()}
+                  LKR {budgetData.reduce((sum, item) => sum + item.spent, 0).toLocaleString()}
                 </p>
                 <p className="text-sm text-red-600">+8.1% from last period</p>
               </div>

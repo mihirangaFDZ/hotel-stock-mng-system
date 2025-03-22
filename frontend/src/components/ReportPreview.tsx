@@ -27,7 +27,7 @@ export const ReportPreview: React.FC<ReportPreviewProps> = ({ onClose, data }) =
           {/* Summary Section */}
           <div className="space-y-4">
             <h3 className="text-xl font-semibold">Summary</h3>
-            <p className="text-lg">Total Spending: ${data.totalSpending.toLocaleString()}</p>
+            <p className="text-lg">Total Spending: LKR {data.totalSpending.toLocaleString()}</p>
             <p className="text-gray-600">Period: Last 6 months</p>
           </div>
 
@@ -45,7 +45,7 @@ export const ReportPreview: React.FC<ReportPreviewProps> = ({ onClose, data }) =
                 {data.monthlySpending.map((item, index) => (
                   <tr key={index} className="border-b">
                     <td className="px-4 py-2">{item.month}</td>
-                    <td className="px-4 py-2 text-right">${item.amount.toLocaleString()}</td>
+                    <td className="px-4 py-2 text-right">LKR {item.amount.toLocaleString()}</td>
                   </tr>
                 ))}
               </tbody>
@@ -68,7 +68,7 @@ export const ReportPreview: React.FC<ReportPreviewProps> = ({ onClose, data }) =
                   <tr key={index} className="border-b">
                     <td className="px-4 py-2">{item.name}</td>
                     <td className="px-4 py-2 text-right">{item.quantity}</td>
-                    <td className="px-4 py-2 text-right">${item.total.toLocaleString()}</td>
+                    <td className="px-4 py-2 text-right">LKR {item.total.toLocaleString()}</td>
                   </tr>
                 ))}
               </tbody>
@@ -89,7 +89,7 @@ export const ReportPreview: React.FC<ReportPreviewProps> = ({ onClose, data }) =
                 {data.topSuppliers.map((supplier, index) => (
                   <tr key={index} className="border-b">
                     <td className="px-4 py-2">{supplier.name}</td>
-                    <td className="px-4 py-2 text-right">${supplier.total.toLocaleString()}</td>
+                    <td className="px-4 py-2 text-right">LKR {supplier.total.toLocaleString()}</td>
                   </tr>
                 ))}
               </tbody>

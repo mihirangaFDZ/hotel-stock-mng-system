@@ -33,7 +33,7 @@ export const SpendingHistory: React.FC<SpendingHistoryProps> = ({ purchases }) =
                 <td className="py-3 px-4">{purchase.category}</td>
                 <td className="py-3 px-4">{purchase.supplier}</td>
                 <td className="py-3 px-4 text-right">{purchase.quantity}</td>
-                <td className="py-3 px-4 text-right">${purchase.price.toFixed(2)}</td>
+                <td className="py-3 px-4 text-right">LKR {purchase.price.toFixed(2)}</td>
                 <td className="py-3 px-4 text-right">
                   {format(new Date(purchase.date), 'MMM dd, yyyy')}
                 </td>
