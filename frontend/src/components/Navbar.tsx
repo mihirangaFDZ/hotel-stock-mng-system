@@ -19,7 +19,7 @@ const Navbar = () => {
             <NavLink to="/shopping-list" icon={<ShoppingCart />} text="Shopping List" />
             <NavLink to="/users" icon={<Users />} text="Users" />
             <NavLink to="/waste-tracking" icon={<Trash2 />} text="Waste Tracking" />
-            <NavLink to="/ai-bot" icon={<Bot />} text="AI Assistant" />
+            <NavLink to="/inventory" icon={<Bot />} text="AI Assistant" />
           </div>
 
           <div className="md:hidden">
@@ -40,7 +40,7 @@ const Navbar = () => {
               <MobileNavLink to="/shopping-list" icon={<ShoppingCart />} text="Shopping List" />
               <MobileNavLink to="/users" icon={<Users />} text="Users" />
               <MobileNavLink to="/waste-tracking" icon={<Trash2 />} text="Waste Tracking" />
-              <MobileNavLink to="/ai-bot" icon={<Bot />} text="AI Assistant" />
+              <MobileNavLink to="/inventory" icon={<Bot />} text="AI Assistant" />
             </div>
           </div>
         )}
