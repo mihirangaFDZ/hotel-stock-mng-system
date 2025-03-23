@@ -7,23 +7,25 @@ import AllProducts from './pages/inventory/all-products.tsx';
 import ShoppingList from './pages/smart-shopping-list/shopping-list.tsx';
 import PushaseSpending from './pages/smart-shopping-list/purchase-spending.tsx';
 import Reports from './pages/smart-shopping-list/purchase-budget-reports.tsx';
+import UpdateItem from './pages/inventory/update-inventory-item.tsx';
+import { ToastContainer } from 'react-toastify';
 
 function App() {
   return (
     <Router>
       <div className="min-h-screen bg-gray-50">
         <Navbar />
+        <ToastContainer position="top-right" autoClose={3000} />
         <div className="max-w-7xl mx-auto px-4 py-6">
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path='/inventory-dash' element={<InventoryDash/>}/>
-            <Route path='/add-item' element={<AddItem/>}/>
-            <Route path='/all-products' element={<AllProducts/>}/>
-            <Route path='/shopping-list' element={<ShoppingList/>}/>
-            <Route path='/pushase-spending' element={<PushaseSpending/>}/>
-            <Route path='/reports' element={<Reports/>}/>
-
-
+            <Route path='/inventory-dash' element={<InventoryDash />} />
+            <Route path='/add-item' element={<AddItem />} />
+            <Route path='/all-products' element={<AllProducts />} />
+            <Route path='/shopping-list' element={<ShoppingList />} />
+            <Route path='/pushase-spending' element={<PushaseSpending />} />
+            <Route path='/reports' element={<Reports />} />
+            <Route path='/update-item/:id' element={<UpdateItem/>} />
           </Routes>
         </div>
       </div>
