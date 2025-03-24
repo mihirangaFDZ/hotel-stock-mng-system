@@ -9,13 +9,15 @@ import PushaseSpending from './pages/smart-shopping-list/purchase-spending.tsx';
 import Reports from './pages/smart-shopping-list/purchase-budget-reports.tsx';
 import UpdateItem from './pages/inventory/update-inventory-item.tsx';
 import { ToastContainer } from 'react-toastify';
+import Breadcrumb from './components/Breadcrumb.tsx';
 
 function App() {
   return (
     <Router>
       <div className="min-h-screen bg-gray-50">
-        <Navbar />
+        <Navbar /> 
         <ToastContainer position="top-right" autoClose={3000} />
+        <Breadcrumb />
         <div className="max-w-7xl mx-auto px-4 py-6">
           <Routes>
             <Route path="/" element={<HomePage />} />

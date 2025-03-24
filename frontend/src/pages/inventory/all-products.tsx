@@ -1,8 +1,9 @@
-import { ArrowUpDown, Edit, Filter, Package, Plus, Search, Trash2 } from 'lucide-react';
+import { ArrowUpDown, Download, Edit, Filter, Package, Plus, Search, Trash2 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import InventoryReport from './../../components/InventoryReport'; // Adjust the path based on your file structure
 
 // API Configuration
 const API_URL = 'http://localhost:8070/api/inventory/';
@@ -120,6 +121,7 @@ const AllProducts = () => {
                 ? Number(aValue) - Number(bValue)
                 : Number(bValue) - Number(aValue);
         });
+        
 
     // Render
     return (
@@ -135,14 +137,17 @@ const AllProducts = () => {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
                 <h1 className="text-3xl font-bold text-gray-800 mb-4 md:mb-0">Inventory Management</h1>
+                <div className='flex space-x-2'>
+                <InventoryReport inventory={filteredInventory} />
                 <button
                     onClick={() => navigate('/add-item')}
                     className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 flex items-center transition shadow-sm"
                     disabled={loading}
                 >
-                    <Plus className="h-5 w-5 mr-2" />
+                    <Plus className="h-4 w-4 mr-2" />
                     Add New Item
                 </button>
+                </div>
             </div>
 
             {/* Filters */}
