@@ -80,7 +80,7 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
 function reports() {
   const [dateRange, setDateRange] = useState('month');
-  const [department, setDepartment] = useState('all');
+  const [department, setDepartment] = useState<'all' | 'kitchen' | 'housekeeping' | 'maintenance'>('all');
   const [budgetData, setBudgetData] = useState(initialBudgetData);
   const [purchasePatterns, setPurchasePatterns] = useState(initialPurchasePatterns);
   const [isLoading, setIsLoading] = useState(false);
@@ -119,7 +119,7 @@ function reports() {
         budget: item.budget * 0.6,
         spent: item.spent * 0.6,
       })));
-      setPurchasePatterns(departmentData[department].purchasePatterns);
+      setPurchasePatterns(departmentData[department as keyof typeof departmentData].purchasePatterns);
     }
   }, [dateRange, department]);
 
@@ -207,7 +207,7 @@ function reports() {
             <select
               className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2"
               value={department}
-              onChange={(e) => setDepartment(e.target.value)}
+              onChange={(e) => setDepartment(e.target.value as 'all' | 'kitchen' | 'housekeeping' | 'maintenance')}
             >
               <option value="all">All Departments</option>
               <option value="kitchen">Kitchen</option>
@@ -279,7 +279,7 @@ function reports() {
                 dataKey="purchases"
                 label
               >
-                {purchasePatterns.map((entry, index) => (
+                {purchasePatterns.map((_entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>

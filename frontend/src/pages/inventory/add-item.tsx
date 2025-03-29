@@ -70,10 +70,10 @@ const addItem = () => {
                     {/* Cards Container */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-6 w-full" >
                         {/* Card 1 */}
-                        <a href="/shopping-list">
+                        <a href="/all-products">
                             <div className="bg-white shadow-lg rounded-lg p-6" id='card'>
                                 <ShoppingCart className="h-8 w-8 text-blue-600" />
-                                <h2 className="text-xl font-semibold">Total Products</h2>
+                                <h2 className="text-xl font-semibold">All Products</h2>
                                 <p className="text-gray-600">Details about stock 2.</p>
                             </div>
                         </a>
@@ -82,7 +82,7 @@ const addItem = () => {
                         <a href="">
                             <div className="bg-white shadow-lg rounded-lg p-6" id='card'>
                                 <DollarSign className="h-8 w-8 text-green-600" />
-                                <h2 className="text-xl font-semibold">Total Store Value</h2>
+                                <h2 className="text-xl font-semibold">All products</h2>
                                 <p className="text-gray-600">Details about stock 2.</p>
                             </div>
                         </a>
