@@ -1,31 +1,30 @@
 import { DollarSign, Plus, ShoppingCart, Tag, XCircle } from 'lucide-react';
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { toast } from 'react-toastify';
 
+// API Configuration
+const API_URL = 'http://localhost:8070/api/inventory/';
 
+// Constants
+const categories = ['Household', 'Cleaning', 'Personal Care', 'Electronics', 'Food'];
+const locations = ['Kitchen Cabinet', 'Under Sink', 'Laundry Room', 'Utility Drawer', 'Storage Closet', 'Bathroom', 'Bathroom Cabinet'];
 
-// Mock data for demonstration
-const initialInventory = [
-    { id: 1, name: 'Paper Towels', category: 'Household', quantity: 4, unit: 'rolls', location: 'Kitchen Cabinet', expiry: '2025-06-15' },
-    { id: 2, name: 'Dish Soap', category: 'Cleaning', quantity: 2, unit: 'bottles', location: 'Under Sink', expiry: null },
-    { id: 3, name: 'Laundry Detergent', category: 'Cleaning', quantity: 1, unit: 'bottle', location: 'Laundry Room', expiry: '2024-12-10' },
-    { id: 4, name: 'Batteries (AA)', category: 'Electronics', quantity: 8, unit: 'pcs', location: 'Utility Drawer', expiry: null },
-    { id: 5, name: 'Light Bulbs', category: 'Household', quantity: 6, unit: 'pcs', location: 'Storage Closet', expiry: null },
-    { id: 6, name: 'Toothpaste', category: 'Personal Care', quantity: 3, unit: 'tubes', location: 'Bathroom', expiry: '2025-03-22' },
-    { id: 7, name: 'Toilet Paper', category: 'Household', quantity: 12, unit: 'rolls', location: 'Bathroom Cabinet', expiry: null },
-    { id: 8, name: 'Hand Soap', category: 'Personal Care', quantity: 2, unit: 'bottles', location: 'Bathroom', expiry: '2025-01-15' },
-];
+// Types
+interface InventoryItem {
+    name: string;
+    category: string;
+    quantity: number;
+    unit: string;
+    location: string;
+    expiry?: string;
+}
 
-const categories = ['All', 'Household', 'Cleaning', 'Personal Care', 'Electronics', 'Food'];
-const locations = ['All', 'Kitchen Cabinet', 'Under Sink', 'Laundry Room', 'Utility Drawer', 'Storage Closet', 'Bathroom', 'Bathroom Cabinet'];
-
-
-const addItem = () => {
+const AddItem = () => {
     const navigate = useNavigate();
-
-    const [inventory, setInventory] = useState(initialInventory);
-    const [newItem, setNewItem] = useState({
+    
+    const [newItem, setNewItem] = useState<InventoryItem>({
         name: '',
         category: 'Household',
         quantity: 1,
@@ -33,104 +32,142 @@ const addItem = () => {
         location: 'Kitchen Cabinet',
         expiry: ''
     });
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-    const handleAddItem = (e: React.FormEvent) => {
+    // Form submission handler
+    const handleAddItem = async (e: React.FormEvent) => {
         e.preventDefault();
-        const newId = Math.max(...inventory.map(item => item.id)) + 1;
-        setInventory([...inventory, { ...newItem, id: newId, expiry: newItem.expiry || null }]);
-        setNewItem({
-            name: '',
-            category: 'Household',
-            quantity: 1,
-            unit: 'pcs',
-            location: 'Kitchen Cabinet',
-            expiry: ''
-        });
-        toast.success('Item added successfully');
-        navigate('/inventory-dash');
+        
+        // Validation
+        if (!newItem.name.trim()) {
+            setError('Item name is required');
+            return;
+        }
+        if (newItem.quantity <= 0) {
+            setError('Quantity must be greater than 0');
+            return;
+        }
+        if (!newItem.unit.trim()) {
+            setError('Unit is required');
+            return;
+        }
 
+        setLoading(true);
+        setError(null);
 
+        try {
+            // API call to save item to database
+            const response = await axios.post(API_URL, {
+                itemName: newItem.name,
+                category: newItem.category,
+                quantity: newItem.quantity,
+                unitType: newItem.unit,
+                location: newItem.location,
+                expiryDate: newItem.expiry || null
+            });
+
+            // Reset form
+            setNewItem({
+                name: '',
+                category: 'Household',
+                quantity: 1,
+                unit: 'pcs',
+                location: 'Kitchen Cabinet',
+               
+            });
+
+            toast.success('Item added successfully');
+            navigate('/inventory-dash');
+        } catch (err) {
+            setError('Failed to add item. Please try again.');
+            console.error('Error adding item:', err);
+            toast.error('Failed to add item');
+        } finally {
+            setLoading(false);
+        }
     };
 
-
+    // Render
     return (
         <div className="container mx-auto px-4 py-6 fade-in">
+            {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4 md:mb-0">Inventory Management</h1>
-        <button 
-          onClick={() => navigate('/add-item')}
-          className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 flex items-center justify-center transition shadow-sm"
-        >
-          <Plus className="h-5 w-5 mr-2" />
-          <span>Add New Item</span>
-        </button>
-      </div>
-            <div className="container mx-auto px-4 py-6 fade-in">
-                <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
-                    {/* Cards Container */}
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 w-full" >
-                        {/* Card 1 */}
-                        <a href="/all-products">
-                            <div className="bg-white shadow-lg rounded-lg p-6" id='card'>
-                                <ShoppingCart className="h-8 w-8 text-blue-600" />
-                                <h2 className="text-xl font-semibold">All Products</h2>
-                                <p className="text-gray-600">Details about stock 2.</p>
-                            </div>
-                        </a>
-
-                        {/* Card 2 */}
-                        <a href="">
-                            <div className="bg-white shadow-lg rounded-lg p-6" id='card'>
-                                <DollarSign className="h-8 w-8 text-green-600" />
-                                <h2 className="text-xl font-semibold">All products</h2>
-                                <p className="text-gray-600">Details about stock 2.</p>
-                            </div>
-                        </a>
-
-                        {/* Card 3 */}
-                        <a href="">
-                            <div className="bg-white shadow-lg rounded-lg p-6" id='card'>
-                                <XCircle className="h-8 w-8 text-red-600" />
-                                <h2 className="text-xl font-semibold">Out of stock</h2>
-                                <p className="text-gray-600">Details about stock 3.</p>
-                            </div>
-                        </a>
-
-
-                        {/* Card 4 */}
-                        <a href="">
-                            <div className="bg-white shadow-lg rounded-lg p-6" id='card'>
-                                <Tag className="h-8 w-8 text-yellow-600" />
-                                <h2 className="text-xl font-semibold">All Categories</h2>
-                                <p className="text-gray-600">Details about stock 4.</p>
-                            </div>
-                        </a>
-                    </div>
-                </div>
+                <h1 className="text-3xl font-bold text-gray-800 mb-4 md:mb-0">Inventory Management</h1>
+                <button
+                    onClick={() => navigate('/inventory-dash')}
+                    className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 flex items-center justify-center transition shadow-sm"
+                    disabled={loading}
+                >
+                    <Plus className="h-5 w-5 mr-2" />
+                    <span>View Inventory</span>
+                </button>
             </div>
-            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 mb-6">
+
+            {/* Dashboard Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                <a href="/all-products" className="bg-white shadow-lg rounded-lg p-6 hover:shadow-xl transition">
+                    <ShoppingCart className="h-8 w-8 text-blue-600 mb-2" />
+                    <h2 className="text-xl font-semibold">Total Products</h2>
+                    <p className="text-gray-600">View your shopping list</p>
+                </a>
+                <a href="#" className="bg-white shadow-lg rounded-lg p-6 hover:shadow-xl transition">
+                    <DollarSign className="h-8 w-8 text-green-600 mb-2" />
+                    <h2 className="text-xl font-semibold">Total Store Value</h2>
+                    <p className="text-gray-600">Check inventory value</p>
+                </a>
+                <a href="#" className="bg-white shadow-lg rounded-lg p-6 hover:shadow-xl transition">
+                    <XCircle className="h-8 w-8 text-red-600 mb-2" />
+                    <h2 className="text-xl font-semibold">Out of Stock</h2>
+                    <p className="text-gray-600">View low stock items</p>
+                </a>
+                <a href="#" className="bg-white shadow-lg rounded-lg p-6 hover:shadow-xl transition">
+                    <Tag className="h-8 w-8 text-yellow-600 mb-2" />
+                    <h2 className="text-xl font-semibold">All Categories</h2>
+                    <p className="text-gray-600">Browse by category</p>
+                </a>
+            </div>
+
+            {/* Add Item Form */}
+            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
                 <h2 className="text-xl font-semibold mb-4">Add New Item</h2>
+                
+                {error && (
+                    <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
+                        {error}
+                    </div>
+                )}
+
                 <form onSubmit={handleAddItem}>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Item Name</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="name">
+                                Item Name
+                            </label>
                             <input
                                 type="text"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                id="name"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
                                 value={newItem.name}
                                 onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
                                 required
+                                disabled={loading}
+                                placeholder="Enter item name"
                             />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="category">
+                                Category
+                            </label>
                             <select
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                id="category"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
                                 value={newItem.category}
                                 onChange={(e) => setNewItem({ ...newItem, category: e.target.value })}
+                                disabled={loading}
                             >
-                                {categories.filter(c => c !== 'All').map(category => (
+                                {categories.map(category => (
                                     <option key={category} value={category}>{category}</option>
                                 ))}
                             </select>
@@ -141,61 +178,78 @@ const addItem = () => {
                             <div className="flex">
                                 <input
                                     type="number"
-                                    className="w-2/3 px-3 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-2/3 px-3 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
                                     value={newItem.quantity}
-                                    onChange={(e) => setNewItem({ ...newItem, quantity: parseInt(e.target.value) })}
+                                    onChange={(e) => setNewItem({ ...newItem, quantity: parseInt(e.target.value) || 1 })}
                                     min="1"
                                     required
+                                    disabled={loading}
                                 />
                                 <input
                                     type="text"
-                                    className="w-1/3 px-3 py-2 border border-gray-300 rounded-r-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-1/3 px-3 py-2 border border-gray-300 rounded-r-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
                                     value={newItem.unit}
                                     onChange={(e) => setNewItem({ ...newItem, unit: e.target.value })}
                                     placeholder="unit"
                                     required
+                                    disabled={loading}
                                 />
                             </div>
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="location">
+                                Location
+                            </label>
                             <select
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                id="location"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
                                 value={newItem.location}
                                 onChange={(e) => setNewItem({ ...newItem, location: e.target.value })}
+                                disabled={loading}
                             >
-                                {locations.filter(l => l !== 'All').map(location => (
+                                {locations.map(location => (
                                     <option key={location} value={location}>{location}</option>
                                 ))}
                             </select>
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Expiry Date (Optional)</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="expiry">
+                                Expiry Date (Optional)
+                            </label>
                             <input
                                 type="date"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                id="expiry"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
                                 value={newItem.expiry}
                                 onChange={(e) => setNewItem({ ...newItem, expiry: e.target.value })}
+                                disabled={loading}
                             />
                         </div>
                     </div>
 
                     <div className="flex justify-end space-x-3">
-
+                        <button
+                            type="button"
+                            className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-100 disabled:opacity-50"
+                            onClick={() => navigate('/inventory-dash')}
+                            disabled={loading}
+                        >
+                            Cancel
+                        </button>
                         <button
                             type="submit"
-                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-
+                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-400"
+                            disabled={loading}
                         >
-                            Add Item
+                            {loading ? 'Adding...' : 'Add Item'}
                         </button>
                     </div>
                 </form>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default addItem
+export default AddItem;
