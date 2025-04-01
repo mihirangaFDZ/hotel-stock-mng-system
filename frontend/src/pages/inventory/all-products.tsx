@@ -10,7 +10,8 @@ const API_URL = 'http://localhost:8070/api/inventory/';
 
 // Constants
 const categories = ['All', 'Household', 'Cleaning', 'Personal Care', 'Electronics', 'Food'];
-const locations = ['All', 'Kitchen Cabinet', 'Under Sink', 'Laundry Room', 'Utility Drawer', 'Storage Closet', 'Bathroom', 'Bathroom Cabinet'];
+const departments = ['All', 'Kitchen Cabinet', 'Under Sink', 'Laundry Room', 'Utility Drawer', 'Storage Closet', 'Bathroom', 'Bathroom Cabinet'];
+
 
 // Types
 interface InventoryItem {
@@ -19,7 +20,7 @@ interface InventoryItem {
     category: string;
     quantity: number;
     unitType: string;
-    location: string;
+    department: string;
     expiryDate?: string;
     updatedAt?: string;
 }
@@ -28,7 +29,7 @@ const AllProducts = () => {
     const [inventory, setInventory] = useState<InventoryItem[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('All');
-    const [selectedLocation, setSelectedLocation] = useState('All');
+    const [selectedDepartment, setSelectedDepartment] = useState('All');
     const [sortField, setSortField] = useState<keyof InventoryItem>('itemName');
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
     const [loading, setLoading] = useState(false);
@@ -102,7 +103,7 @@ const AllProducts = () => {
         .filter(item =>
             item.itemName.toLowerCase().includes(searchTerm.toLowerCase()) &&
             (selectedCategory === 'All' || item.category === selectedCategory) &&
-            (selectedLocation === 'All' || item.location === selectedLocation)
+            (selectedDepartment === 'All' || item.department === selectedDepartment)
         )
         .sort((a, b) => {
             const aValue = a[sortField];
@@ -181,17 +182,17 @@ const AllProducts = () => {
                         </select>
                     </div>
 
-                    {/* Location Filter */}
+                    {/* Department Filter */}
                     <div className="flex items-center space-x-2">
                         <Package className="h-5 w-5 text-gray-500" />
                         <select
                             className="bg-gray-50 border-none rounded-lg px-3 py-2 w-full outline-none"
-                            value={selectedLocation}
-                            onChange={(e) => setSelectedLocation(e.target.value)}
+                            value={selectedDepartment}
+                            onChange={(e) => setSelectedDepartment(e.target.value)}
                             disabled={loading}
                         >
-                            {locations.map(location => (
-                                <option key={location} value={location}>{location}</option>
+                            {departments.map(department => (
+                                <option key={department} value={department}>{department}</option>
                             ))}
                         </select>
                     </div>
@@ -212,7 +213,7 @@ const AllProducts = () => {
                             <table className="min-w-full divide-y divide-gray-200">
                                 <thead className="bg-gray-50">
                                     <tr>
-                                        {['itemName', 'category', 'quantity', 'location', 'expiryDate'].map(field => (
+                                        {['itemName', 'category', 'quantity', 'department', 'expiryDate'].map(field => (
                                             <th
                                                 key={field}
                                                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
@@ -244,7 +245,7 @@ const AllProducts = () => {
                                                 {item.quantity} {item.unitType}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {item.location}
+                                                {item.department}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                                 {item.expiryDate ? new Date(item.expiryDate).toLocaleDateString() : 'N/A'}
@@ -361,14 +362,14 @@ const AllProducts = () => {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">Location</label>
+                                    <label className="block text-sm font-medium text-gray-700">Department</label>
                                     <select
-                                        value={editingItem.location}
-                                        onChange={(e) => setEditingItem({ ...editingItem, location: e.target.value })}
+                                        value={editingItem.department}
+                                        onChange={(e) => setEditingItem({ ...editingItem, department: e.target.value })}
                                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
                                     >
-                                        {locations.slice(1).map(location => (
-                                            <option key={location} value={location}>{location}</option>
+                                        {departments.slice(1).map(department => (
+                                            <option key={department} value={department}>{department}</option>
                                         ))}
                                     </select>
                                 </div>

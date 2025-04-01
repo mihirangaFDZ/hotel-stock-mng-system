@@ -9,16 +9,18 @@ const API_URL = 'http://localhost:8070/api/inventory/';
 
 // Constants
 const categories = ['Household', 'Cleaning', 'Personal Care', 'Electronics', 'Food'];
-const locations = ['Kitchen Cabinet', 'Under Sink', 'Laundry Room', 'Utility Drawer', 'Storage Closet', 'Bathroom', 'Bathroom Cabinet'];
+const departments = ['Kitchen', 'House Keping', 'Maintenence'];
 
 // Types
 interface InventoryItem {
+    price: number ;
+    currency: string  ;
     _id?: string;
     itemName: string;
     category: string;
     quantity: number;
     unitType: string;
-    location: string;
+    department: string;
     expiryDate?: string;
 }
 
@@ -31,8 +33,10 @@ const UpdateItem = () => {
         category: 'Household',
         quantity: 1,
         unitType: 'pcs',
-        location: 'Kitchen Cabinet',
-        expiryDate: ''
+        department: 'Kitchen Cabinet',
+        expiryDate: '',
+        price: 0 ,
+        currency: 'LKR'  
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -54,8 +58,10 @@ const UpdateItem = () => {
                 category: fetchedItem.category || 'Household',
                 quantity: fetchedItem.quantity || 1,
                 unitType: fetchedItem.unitType || 'pcs',
-                location: fetchedItem.location || 'Kitchen Cabinet',
-                expiryDate: fetchedItem.expiryDate ? fetchedItem.expiryDate.split('T')[0] : ''
+                department: fetchedItem.department || 'Kitchen Cabinet',
+                expiryDate: fetchedItem.expiryDate ? fetchedItem.expiryDate.split('T')[0] : '',
+                price: fetchedItem.price || 0,
+                currency: fetchedItem.currency || 'LKR',
             });
         } catch (err) {
             setError('Failed to load item data');
@@ -94,7 +100,7 @@ const UpdateItem = () => {
                 category: item.category,
                 quantity: item.quantity,
                 unitType: item.unitType,
-                location: item.location,
+                department: item.department,
                 expiryDate: item.expiryDate || null
             });
 
@@ -198,18 +204,18 @@ const UpdateItem = () => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="location">
-                                    Location
+                                <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="department">
+                                    department
                                 </label>
                                 <select
-                                    id="location"
+                                    id="department"
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
-                                    value={item.location}
-                                    onChange={(e) => setItem({ ...item, location: e.target.value })}
+                                    value={item.department}
+                                    onChange={(e) => setItem({ ...item, department: e.target.value })}
                                     disabled={loading}
                                 >
-                                    {locations.map(location => (
-                                        <option key={location} value={location}>{location}</option>
+                                    {departments.map(department => (
+                                        <option key={department} value={department}>{department}</option>
                                     ))}
                                 </select>
                             </div>
@@ -227,6 +233,31 @@ const UpdateItem = () => {
                                     disabled={loading}
                                 />
                             </div>
+                            <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Price</label>
+                            <div className="flex">
+                                <input
+                                    type="number"
+                                    className="w-2/3 px-3 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                                    value={item.price}
+                                    onChange={(e) =>
+                                        setItem({ ...item, price: parseInt(e.target.value) })
+                                    }
+                                    
+                                    required
+                                    disabled={loading}
+                                />
+                                <input
+                                    type="text"
+                                    className="w-1/3 px-3 py-2 border border-gray-300 rounded-r-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                                    value={item.currency}
+                                    onChange={(e) => setItem({ ...item, currency: e.target.value })}
+                                    placeholder="unit"
+                                    required
+                                    disabled
+                                />
+                            </div>
+                        </div>
                         </div>
 
                         <div className="flex justify-end space-x-3">

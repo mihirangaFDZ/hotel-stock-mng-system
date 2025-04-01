@@ -7,7 +7,7 @@ interface InventoryItem {
     category: string;
     quantity: number;
     unitType: string;
-    location: string;
+    department: string;
     expiryDate?: string;
     updatedAt?: string;
 }
@@ -92,7 +92,7 @@ const InventoryReport: React.FC<InventoryReportProps> = ({ inventory }) => {
                                 <th>Item Name</th>
                                 <th>Category</th>
                                 <th>Quantity</th>
-                                <th>Location</th>
+                                <th>Department</th>
                                 <th>Expiry Date</th>
                             </tr>
                         </thead>
@@ -102,7 +102,7 @@ const InventoryReport: React.FC<InventoryReportProps> = ({ inventory }) => {
                                     <td>${item.itemName}</td>
                                     <td>${item.category}</td>
                                     <td>${item.quantity} ${item.unitType}</td>
-                                    <td>${item.location}</td>
+                                    <td>${item.department}</td>
                                     <td>${item.expiryDate ? new Date(item.expiryDate).toLocaleDateString() : 'N/A'}</td>
                                 </tr>
                             `).join('')}

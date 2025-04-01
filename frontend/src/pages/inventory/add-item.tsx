@@ -9,7 +9,7 @@ const API_URL = 'http://localhost:8070/api/inventory/';
 
 // Constants
 const categories = ['Household', 'Cleaning', 'Personal Care', 'Electronics', 'Food'];
-const locations = ['Kitchen Cabinet', 'Under Sink', 'Laundry Room', 'Utility Drawer', 'Storage Closet', 'Bathroom', 'Bathroom Cabinet'];
+const departments = ['Kitchen', 'House Keping', 'Maintenence'];
 
 // Types
 interface InventoryItem {
@@ -17,20 +17,25 @@ interface InventoryItem {
     category: string;
     quantity: number;
     unit: string;
-    location: string;
+    department: string;
     expiry?: string;
+    price?: number;
+    currency: string;
 }
 
 const AddItem = () => {
     const navigate = useNavigate();
-    
+
     const [newItem, setNewItem] = useState<InventoryItem>({
         name: '',
         category: 'Household',
         quantity: 1,
         unit: 'pcs',
-        location: 'Kitchen Cabinet',
+        price: 0,
+        currency: 'LKR',
+        department: 'Kitchen Cabinet',
         expiry: ''
+      
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -38,8 +43,8 @@ const AddItem = () => {
     // Form submission handler
     const handleAddItem = async (e: React.FormEvent) => {
         e.preventDefault();
-        
-        // Validation
+
+        //#region Validation
         if (!newItem.name.trim()) {
             setError('Item name is required');
             return;
@@ -52,29 +57,45 @@ const AddItem = () => {
             setError('Unit is required');
             return;
         }
+        if (newItem.expiry && new Date(newItem.expiry) < new Date()) {
+            setError('Expiry date cannot be in the past');
+            return;
+        }
+        if(newItem.price === undefined || newItem.price <= 0) {
+            setError('Price must be greater than 0');   
+            return;
+        }
+
+      
+
+        //#endregion
 
         setLoading(true);
         setError(null);
 
         try {
             // API call to save item to database
-            const response = await axios.post(API_URL, {
+            await axios.post(API_URL, {
                 itemName: newItem.name,
                 category: newItem.category,
                 quantity: newItem.quantity,
                 unitType: newItem.unit,
-                location: newItem.location,
-                expiryDate: newItem.expiry || null
+                department: newItem.department,
+                expiryDate: newItem.expiry || null,
+                price: newItem.price,
+                currency: newItem.currency,
             });
 
-            // Reset form
+            // Reset form fully
             setNewItem({
                 name: '',
                 category: 'Household',
                 quantity: 1,
                 unit: 'pcs',
-                location: 'Kitchen Cabinet',
-               
+                department: departments[0],
+                expiry: '',
+                price: 0,
+                currency: 'LKR',
             });
 
             toast.success('Item added successfully');
@@ -109,7 +130,7 @@ const AddItem = () => {
                 <a href="/all-products" className="bg-white shadow-lg rounded-lg p-6 hover:shadow-xl transition">
                     <ShoppingCart className="h-8 w-8 text-blue-600 mb-2" />
                     <h2 className="text-xl font-semibold">Total Products</h2>
-                    <p className="text-gray-600">View your shopping list</p>
+                    <p className="text-gray-600">View all products</p>
                 </a>
                 <a href="#" className="bg-white shadow-lg rounded-lg p-6 hover:shadow-xl transition">
                     <DollarSign className="h-8 w-8 text-green-600 mb-2" />
@@ -131,11 +152,9 @@ const AddItem = () => {
             {/* Add Item Form */}
             <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
                 <h2 className="text-xl font-semibold mb-4">Add New Item</h2>
-                
+
                 {error && (
-                    <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
-                        {error}
-                    </div>
+                    <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">{error}</div>
                 )}
 
                 <form onSubmit={handleAddItem}>
@@ -167,8 +186,10 @@ const AddItem = () => {
                                 onChange={(e) => setNewItem({ ...newItem, category: e.target.value })}
                                 disabled={loading}
                             >
-                                {categories.map(category => (
-                                    <option key={category} value={category}>{category}</option>
+                                {categories.map((category) => (
+                                    <option key={category} value={category}>
+                                        {category}
+                                    </option>
                                 ))}
                             </select>
                         </div>
@@ -180,8 +201,10 @@ const AddItem = () => {
                                     type="number"
                                     className="w-2/3 px-3 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
                                     value={newItem.quantity}
-                                    onChange={(e) => setNewItem({ ...newItem, quantity: parseInt(e.target.value) || 1 })}
-                                    min="1"
+                                    onChange={(e) =>
+                                        setNewItem({ ...newItem, quantity: parseInt(e.target.value) || 1 })
+                                    }
+                                    
                                     required
                                     disabled={loading}
                                 />
@@ -198,18 +221,20 @@ const AddItem = () => {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="location">
-                                Location
+                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="department">
+                                department
                             </label>
                             <select
-                                id="location"
+                                id="department"
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
-                                value={newItem.location}
-                                onChange={(e) => setNewItem({ ...newItem, location: e.target.value })}
+                                value={newItem.department}
+                                onChange={(e) => setNewItem({ ...newItem, department: e.target.value })}
                                 disabled={loading}
                             >
-                                {locations.map(location => (
-                                    <option key={location} value={location}>{location}</option>
+                                {departments.map((department) => (
+                                    <option key={department} value={department}>
+                                        {department}
+                                    </option>
                                 ))}
                             </select>
                         </div>
@@ -226,6 +251,31 @@ const AddItem = () => {
                                 onChange={(e) => setNewItem({ ...newItem, expiry: e.target.value })}
                                 disabled={loading}
                             />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Price</label>
+                            <div className="flex">
+                                <input
+                                    type="number"
+                                    className="w-2/3 px-3 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                                    value={newItem.price}
+                                    onChange={(e) =>
+                                        setNewItem({ ...newItem, price: parseInt(e.target.value) })
+                                    }
+                                    
+                                    required
+                                    disabled={loading}
+                                />
+                                <input
+                                    type="text"
+                                    className="w-1/3 px-3 py-2 border border-gray-300 rounded-r-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                                    value={newItem.currency}
+                                    onChange={(e) => setNewItem({ ...newItem, currency: e.target.value })}
+                                    placeholder="unit"
+                                    required
+                                    disabled
+                                />
+                            </div>
                         </div>
                     </div>
 

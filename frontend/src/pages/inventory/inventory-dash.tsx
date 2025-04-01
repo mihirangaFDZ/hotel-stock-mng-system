@@ -36,9 +36,10 @@ interface InventoryItem {
   category: string;
   quantity: number;
   unitType: string;
-  location: string;
+  department: string;
   expiryDate?: string;
   updatedAt?: string;
+  actionHistory?: { actionType: string; timestamp: string }[];
 }
 
 interface CategoryData {
@@ -55,6 +56,7 @@ interface MonthlyUsageData {
   personalCare?: number;
   food?: number;
   vegetables?: number;
+  updatedAt?: { $date: string };
 }
 
 interface StockTrendData {
@@ -189,10 +191,11 @@ const InventoryDash = () => {
 
   // Process data for Recent Activity
   const processRecentActivity = (data: InventoryItem[]) => {
-    const activities = data
-      .filter((item) => item.updatedAt) // Only include items with updatedAt
-      .map((item) => {
-        const date = new Date(item.updatedAt!);
+    const activities: RecentActivity[] = [];
+  
+    data.forEach((item) => {
+      if (item.updatedAt) {
+        const date = new Date(item.updatedAt);
         const now = new Date();
         const diffInMs = now.getTime() - date.getTime();
         const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
@@ -200,19 +203,23 @@ const InventoryDash = () => {
           diffInHours < 24
             ? `${diffInHours} hours ago`
             : `${Math.floor(diffInHours / 24)} days ago`;
-
-        return {
+  
+        activities.push({
           type: 'update',
-          message: `Item Updated`,
+          message: 'Item Updated',
           details: `${item.itemName} (${item.quantity} ${item.unitType}) updated in ${item.category}`,
           timestamp,
-        };
-      })
-      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()) // Sort by most recent
-      .slice(0, 3); // Limit to 3 recent activities
-
-    setRecentActivity(activities);
-  };
+        });
+      }
+    });
+  
+    // Sort by timestamp (most recent first) and limit to 3
+    const sortedActivities = activities
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+      .slice(0, 3);
+  
+    setRecentActivity(sortedActivities);
+  };  
 
   return (
     <div className="container mx-auto px-4 py-6 fade-in">
