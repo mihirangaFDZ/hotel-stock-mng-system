@@ -26,9 +26,24 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8070/api/inventory/';
+const API_URL = 'http://localhost:8070/api/inventory';
 
 const COLORS = ['#4F46E5', '#10B981', '#F59E0B', '#EF4444'];
+
+ const getTotalProducts = async () => {
+  const response = await axios.get(`${API_URL}/total-products`);
+  return response.data.totalItems;
+};
+
+ const getTotalCategories = async () => {
+  const response = await axios.get(`${API_URL}/total-categories`);
+  return response.data.totalCategories;
+};
+
+ const getMonthlySpending = async () => {
+  const response = await axios.get(`${API_URL}/monthly-spending`);
+  return response.data.totalSpending;
+};
 
 interface InventoryItem {
   _id: string;
@@ -80,6 +95,9 @@ const InventoryDash = () => {
   const [monthlyUsage, setMonthlyUsage] = useState<MonthlyUsageData[]>([]);
   const [stockTrends, setStockTrends] = useState<StockTrendData[]>([]);
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
+  const [totalProducts, setTotalProducts] = useState(0);
+  const [totalCategories, setTotalCategories] = useState(0);
+  const [monthlySpending, setMonthlySpending] = useState(0);
 
   // Fetch inventory data on component mount
   useEffect(() => {
@@ -88,7 +106,7 @@ const InventoryDash = () => {
         const response = await axios.get(API_URL);
         const inventoryData = response.data;
         setInventory(inventoryData);
-
+  
         // Process data for charts
         processCategoryData(inventoryData);
         processMonthlyUsage(inventoryData);
@@ -98,9 +116,23 @@ const InventoryDash = () => {
         console.error('Error fetching inventory data:', error);
       }
     };
-
+  
     fetchInventory();
-  }, []);
+  }, []); // Fetch inventory data on component mount
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setTotalProducts(await getTotalProducts());
+        setTotalCategories(await getTotalCategories());
+        setMonthlySpending(await getMonthlySpending());
+      } catch (error) {
+        console.error('Error fetching additional data:', error);
+      }
+    };
+  
+    fetchData();
+  }, []); // Fetch additional data on component mount
 
   // Process data for Category Distribution (Pie Chart)
   const processCategoryData = (data: InventoryItem[]) => {
@@ -239,12 +271,12 @@ const InventoryDash = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 w-full">
             {/* Card 1 */}
             <a href="/all-products">
-              <div className="bg-white shadow-lg rounded-lg p-6" id="card">
-                <ShoppingCart className="h-8 w-8 text-blue-600" />
-                <h2 className="text-xl font-semibold">Total Products</h2>
-                <p className="text-gray-600">Details about products</p>
-              </div>
-            </a>
+          <div className="bg-white shadow-lg rounded-lg p-6" id="card">
+            <ShoppingCart className="h-8 w-8 text-blue-600" />
+            <h2 className="text-xl font-semibold">Total Products</h2>
+            <p className="text-gray-600">{totalProducts} items</p>
+          </div>
+        </a>
 
             {/* Card 2 */}
             <a href="">
