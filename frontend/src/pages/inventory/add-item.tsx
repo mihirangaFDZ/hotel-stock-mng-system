@@ -21,6 +21,7 @@ interface InventoryItem {
     expiry?: string;
     price?: number;
     currency: string;
+    threshold: string;
 }
 //#endregion
 
@@ -37,6 +38,7 @@ const AddItem: React.FC = () => {
         currency: 'LKR',
         department: 'Kitchen Cabinet',
         expiry: '',
+        threshold:'',
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -117,6 +119,7 @@ const AddItem: React.FC = () => {
                 expiryDate: newItem.expiry || null,
                 price: newItem.price,
                 currency: newItem.currency,
+                threshold: newItem.threshold,
             });
 
             // Reset form
@@ -129,6 +132,7 @@ const AddItem: React.FC = () => {
                 expiry: '',
                 price: 0,
                 currency: 'LKR',
+                threshold:'',
             });
 
             toast.success('Item added successfully');
@@ -312,6 +316,28 @@ const AddItem: React.FC = () => {
                                     className="w-1/3 px-3 py-2 border border-gray-300 rounded-r-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
                                     value={newItem.currency}
                                     onChange={(e) => handleInputChange(e, 'currency')}
+                                    required
+                                    disabled
+                                />
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Threshold</label>
+                            <div className="flex">
+                                <input
+                                    type="number"
+                                    className="w-2/3 px-3 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                                    value={newItem.threshold}
+                                    onChange={(e) => handleInputChange(e, 'threshold')}
+                                    required
+                                    disabled={loading}
+                                />
+                                <input
+                                    type="text"
+                                    className="w-1/3 px-3 py-2 border border-gray-300 rounded-r-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                                    value={newItem.unit}
+                                    onChange={(e) => handleInputChange(e, 'unit')}
+                                    placeholder="unit"
                                     required
                                     disabled
                                 />
