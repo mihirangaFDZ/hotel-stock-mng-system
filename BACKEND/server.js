@@ -12,7 +12,8 @@ app.use(cors()); // Enable CORS for frontend
 // Routes
 const itemRoutes = require('./routes/itemRoutes');
 app.use('/', itemRoutes);
-
+// Routes
+app.use('/api/auth', require('./routes/user-managemnt/auth'));
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,

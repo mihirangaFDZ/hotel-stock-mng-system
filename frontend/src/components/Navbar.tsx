@@ -17,8 +17,8 @@ const Navbar = () => {
           <div className="hidden md:flex space-x-6">
             <NavLink to="/inventory-dash" icon={<Package />} text="Inventory" />
             <NavLink to="/shopping-list" icon={<ShoppingCart />} text="Shopping List" />
-            <NavLink to="/users" icon={<Users />} text="Users" />
-            <NavLink to="/waste-tracking" icon={<Trash2 />} text="Waste Tracking" />
+            <NavLink to="/staff-management" icon={<Users />} text="Users" />
+            <NavLink to="/waste-management" icon={<Trash2 />} text="Waste Tracking" />
             <NavLink to="/ai-bot" icon={<Bot />} text="AI Assistant" />
           </div>
 
@@ -38,8 +38,8 @@ const Navbar = () => {
             <div className="flex flex-col space-y-2">
               <MobileNavLink to="/inventory" icon={<Package />} text="Inventory" />
               <MobileNavLink to="/shopping-list" icon={<ShoppingCart />} text="Shopping List" />
-              <MobileNavLink to="/users" icon={<Users />} text="Users" />
-              <MobileNavLink to="/waste-tracking" icon={<Trash2 />} text="Waste Tracking" />
+              <MobileNavLink to="/staff-management" icon={<Users />} text="Users" />
+              <MobileNavLink to="/waste-management" icon={<Trash2 />} text="Waste Tracking" />
               <MobileNavLink to="/ai-bot" icon={<Bot />} text="AI Assistant" />
             </div>
           </div>
