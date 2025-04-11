@@ -1,5 +1,7 @@
 import {
     ArrowUpDown,
+    Check,
+    CheckCheck,
     Edit,
     Filter,
     Package,
@@ -357,13 +359,16 @@ const AllProducts: React.FC = () => {
                                                         placeholder="0"
                                                         disabled={loading}
                                                     />
+                                                   
                                                     <button
                                                         onClick={() => handleUpdateDailyUsage(item)}
-                                                        className="bg-green-600 hover:bg-green-700 text-white rounded-lg px-3 py-1 text-sm"
+                                                        className="text-indigo-600 hover:text-indigo-900  mr-3 rounded-lg px-3 py-1 text-sm border border-gray-300"
                                                         disabled={loading}
                                                     >
-                                                        Update
+                                                       <Check className="h-4 w-4 " />
+
                                                     </button>
+                                                  
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

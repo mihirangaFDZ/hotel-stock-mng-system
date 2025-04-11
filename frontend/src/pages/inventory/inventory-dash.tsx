@@ -17,6 +17,7 @@ interface InventoryItem {
   department: string;
   expiryDate?: string;
   updatedAt?: string;
+  threshold: number;
   price?: number;
 }
 
@@ -70,7 +71,7 @@ const InventoryDash: React.FC = () => {
         const spending = monthlyItems.reduce((total, item) => total + item.quantity * (item.price || 100), 0);
         setMonthlySpending(spending);
 
-        const lowStockCount = inventoryData.filter((item) => item.quantity < 5).length;
+        const lowStockCount = inventoryData.filter((item) => item.quantity < item.threshold).length;
         setLowStockItems(lowStockCount);
       } catch (error) {
         console.error("Error fetching data:", error);
