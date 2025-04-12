@@ -10,6 +10,8 @@ import Reports from './pages/smart-shopping-list/purchase-budget-reports.tsx';
 import UpdateItem from './pages/inventory/update-inventory-item.tsx';
 import { ToastContainer } from 'react-toastify';
 import Breadcrumb from './components/Breadcrumb.tsx';
+import LowStockItems from './pages/inventory/LowStockItems.tsx';
+import Categories from './pages/inventory/Categories.tsx';
 
 function App() {
   return (
@@ -28,6 +30,8 @@ function App() {
             <Route path='/pushase-spending' element={<PurchaseSpending />} />
             <Route path='/reports' element={<Reports />} />
             <Route path='/update-item/:id' element={<UpdateItem/>} />
+            <Route path='low-stock' element={<LowStockItems />} />
+            <Route path='/categories' element={<Categories />} />
           </Routes>
         </div>
       </div>

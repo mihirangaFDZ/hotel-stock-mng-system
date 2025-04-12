@@ -63,7 +63,7 @@ const HomePage = () => {
               href="#get-started"
               className="inline-block bg-indigo-600 text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-indigo-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
             >
-              Start Free Trial
+             Get Start
             </a>
           </motion.div>
         </div>
