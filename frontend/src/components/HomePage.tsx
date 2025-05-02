@@ -122,25 +122,25 @@ const HomePage = () => {
             <div>
               <h4 className="text-lg font-semibold mb-4">Product</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#features" className="hover:text-white">Features</a></li>
-                <li><a href="#pricing" className="hover:text-white">Pricing</a></li>
-                <li><a href="#demo" className="hover:text-white">Demo</a></li>
+                <li className="hover:text-white">Features</li>
+                <li className="hover:text-white">Pricing</li>
+                <li className="hover:text-white">Demo</li>
               </ul>
             </div>
             <div>
               <h4 className="text-lg font-semibold mb-4">Company</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#about" className="hover:text-white">About Us</a></li>
-                <li><a href="#contact" className="hover:text-white">Contact</a></li>
-                <li><a href="#careers" className="hover:text-white">Careers</a></li>
+                <li className="hover:text-white">About Us</li>
+                <li className="hover:text-white">Contact</li>
+                <li className="hover:text-white">Careers</li>
               </ul>
             </div>
             <div>
               <h4 className="text-lg font-semibold mb-4">Support</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#help" className="hover:text-white">Help Center</a></li>
-                <li><a href="#docs" className="hover:text-white">Documentation</a></li>
-                <li><a href="#status" className="hover:text-white">System Status</a></li>
+                <li className="hover:text-white">Help Center</li>
+                <li className="hover:text-white">Documentation</li>
+                <li className="hover:text-white">System Status</li>
               </ul>
             </div>
           </div>

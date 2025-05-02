@@ -27,10 +27,10 @@ function App() {
             <Route path='/add-item' element={<AddItem />} />
             <Route path='/all-products' element={<AllProducts />} />
             <Route path='/shopping-list' element={<ShoppingList />} />
-            <Route path='/pushase-spending' element={<PurchaseSpending />} />
+            <Route path='/purchase-spending' element={<PurchaseSpending />} />
             <Route path='/reports' element={<Reports />} />
             <Route path='/update-item/:id' element={<UpdateItem/>} />
-            <Route path='low-stock' element={<LowStockItems />} />
+            <Route path='/low-stock' element={<LowStockItems />} />
             <Route path='/categories' element={<Categories />} />
           </Routes>
         </div>

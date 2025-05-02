@@ -1,7 +1,7 @@
 import {
     ArrowUpDown,
     Check,
-    CheckCheck,
+
     Edit,
     Filter,
     Package,

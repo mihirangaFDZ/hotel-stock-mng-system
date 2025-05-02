@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { ChevronDown, ChevronUp, Package, AlertTriangle } from "lucide-react";
+import { ChevronDown, ChevronUp,  AlertTriangle } from "lucide-react";
 
 // Constants and Configuration
 const API_URL = "http://localhost:8070/api/inventory/";

@@ -62,14 +62,17 @@ const InventoryDash: React.FC = () => {
         const uniqueCategories = new Set(inventoryData.map((item) => item.category));
         setTotalCategories(uniqueCategories.size);
 
+        // Calculate total inventory value from ALL items, not just current month
+        const totalValue = inventoryData.reduce((total, item) => total + item.quantity * (item.price || 100), 0);
+        setInventoryValue(totalValue);
+
+        // Keep the monthly filtering for other purposes
         const currentMonth = new Date().toLocaleString("default", { month: "long", year: "numeric" });
         const monthlyItems = inventoryData.filter((item) => {
           if (!item.updatedAt) return false;
           const itemDate = new Date(item.updatedAt);
           return itemDate.toLocaleString("default", { month: "long", year: "numeric" }) === currentMonth;
         });
-        const spending = monthlyItems.reduce((total, item) => total + item.quantity * (item.price || 100), 0);
-        setInventoryValue(spending);
 
         const lowStockCount = inventoryData.filter((item) => item.quantity < item.threshold).length;
         setLowStockItems(lowStockCount);
@@ -151,7 +154,7 @@ const InventoryDash: React.FC = () => {
         <a href="#" className="bg-white shadow-lg rounded-lg p-6 hover:shadow-xl transition">
           <DollarSign className="h-8 w-8 text-green-600 mb-2" />
           <h2 className="text-xl font-semibold">Inventory Value</h2>
-          <p className="text-gray-600">{inventoryValue} LKR</p>
+          <p className="text-gray-600">{inventoryValue.toLocaleString()} LKR</p>
         </a>
         <a href="/low-stock" className="bg-white shadow-lg rounded-lg p-6 hover:shadow-xl transition">
           <AlertTriangle className="h-8 w-8 text-red-600 mb-2" />

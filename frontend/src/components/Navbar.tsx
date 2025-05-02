@@ -45,7 +45,6 @@ const Navbar = () => {
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-6">
             <NavLink to="/inventory-dash" icon={<Package className="w-5 h-5" />} text="Inventory" />
-            <NavLink to="/all-products" icon={<ShoppingCart className="w-5 h-5" />} text="All Products" />
             <NavLink to="/shopping-list" icon={<ShoppingCart className="w-5 h-5" />} text="Shopping List" />
             <NavLink to="/users" icon={<Users className="w-5 h-5" />} text="Users" />
             <NavLink to="/ai-bot" icon={<Bot className="w-5 h-5" />} text="AI Assistant" />
