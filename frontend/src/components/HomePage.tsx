@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import { TrendingUp, Package, Clock, Shield, Star } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 // Feature Card Component
 interface FeatureCardProps {
@@ -23,6 +24,7 @@ interface TestimonialCardProps {
 }
 
 const HomePage = () => {
+  const navigate = useNavigate();
 
   
   return (
@@ -44,7 +46,7 @@ const HomePage = () => {
             transition={{ duration: 0.8 }}
             className="text-5xl md:text-6xl font-extrabold leading-tight mb-6"
           >
-            Revolutionize Hotel Inventory Management
+            Hotel Inventory Management
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}

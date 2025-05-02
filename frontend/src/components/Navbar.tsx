@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { NavLink as RouterLink, useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { NavLink as RouterLink, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Hotel,
@@ -9,21 +9,43 @@ import {
   Trash2,
   Bot,
   Menu,
+  LogIn,
+  UserCircle2,
+  ChevronDown,
+  LogOut,
   X,
   User,
   Settings,
-  LogOut,
 } from 'lucide-react';
 
 const Navbar = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-  const location = useLocation();
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  
+  // Get authentication state from localStorage
+  const storedAuth = localStorage.getItem('authState');
+  const authState = storedAuth ? JSON.parse(storedAuth) : { isAuthenticated: false, currentUser: null };
+  
+  // Check if user has admin or manager role
+  const hasUserManagementAccess = () => {
+    if (!authState?.currentUser?.role) return false;
+    return ['admin', 'manager'].includes(authState.currentUser.role.toLowerCase());
+  };
+  
+  // Handle logout function
+  const handleLogout = () => {
+    localStorage.removeItem('authState');
+    navigate('/login');
+  };
 
   // Close all menus when navigating
-  React.useEffect(() => {
+  useEffect(() => {
     setIsMobileMenuOpen(false);
     setIsProfileMenuOpen(false);
+    setUserDropdownOpen(false);
   }, [location]);
 
   return (
@@ -41,50 +63,49 @@ const Navbar = () => {
             </div>
             <span className="text-xl font-bold tracking-tight">HotelStock</span>
           </RouterLink>
-
-          {/* Desktop Menu */}
+          
           <div className="hidden md:flex items-center space-x-6">
-            <NavLink to="/inventory-dash" icon={<Package className="w-5 h-5" />} text="Inventory" />
-            <NavLink to="/shopping-list" icon={<ShoppingCart className="w-5 h-5" />} text="Shopping List" />
-            <NavLink to="/users" icon={<Users className="w-5 h-5" />} text="Users" />
-            <NavLink to="/ai-bot" icon={<Bot className="w-5 h-5" />} text="AI Assistant" />
-
-            {/* Profile Menu */}
-            <div className="relative">
-              <button
-                onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                className="flex items-center space-x-2 p-2 rounded-full bg-indigo-600 hover:bg-indigo-700 transition-colors focus:outline-none"
-              >
-                <User className="w-5 h-5" />
-                <span className="hidden lg:inline">Profile</span>
-              </button>
-              <AnimatePresence>
-                {isProfileMenuOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.2 }}
-                    className="absolute right-0 mt-2 w-48 bg-white text-gray-900 rounded-lg shadow-xl py-2"
-                  >
-                    <RouterLink
-                      to="/settings"
-                      className="flex items-center space-x-2 px-4 py-2 hover:bg-indigo-100"
+            <NavLink to="/inventory-dash" icon={<Package />} text="Inventory" />
+            <NavLink to="/shopping-list" icon={<ShoppingCart />} text="Shopping List" />
+            {/* Only show User Management for admin and manager roles */}
+            {hasUserManagementAccess() && (
+              <NavLink to="/staff-management" icon={<Users />} text="Users" />
+            )}
+            <NavLink to="/waste-management" icon={<Trash2 />} text="Waste Tracking" />
+            <NavLink to="/ai-bot" icon={<Bot />} text="AI Assistant" />
+            
+            {authState?.isAuthenticated ? (
+              <div className="relative">
+                <button
+                  onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                  className="flex items-center space-x-1 px-4 py-2 rounded-full bg-indigo-700 text-white hover:bg-indigo-800 transition-colors"
+                >
+                  <UserCircle2 className="h-5 w-5" />
+                  <span>{authState.currentUser?.name}</span>
+                  <ChevronDown className="h-4 w-4 ml-1" />
+                </button>
+                
+                {userDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-1 z-50">
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center w-full px-4 py-2 text-gray-700 hover:bg-indigo-50"
                     >
-                      <Settings className="w-4 h-4" />
-                      <span>Settings</span>
-                    </RouterLink>
-                    <RouterLink
-                      to="/logout"
-                      className="flex items-center space-x-2 px-4 py-2 hover:bg-indigo-100"
-                    >
-                      <LogOut className="w-4 h-4" />
+                      <LogOut className="h-4 w-4 mr-2" />
                       <span>Logout</span>
-                    </RouterLink>
-                  </motion.div>
+                    </button>
+                  </div>
                 )}
-              </AnimatePresence>
-            </div>
+              </div>
+            ) : (
+              <button
+                onClick={() => navigate('/login')}
+                className="flex items-center space-x-1 px-4 py-2 rounded-md bg-white text-indigo-600 hover:bg-indigo-50 transition-colors"
+              >
+                <LogIn className="h-4 w-4" />
+                <span>Login</span>
+              </button>
+            )}
           </div>
 
           {/* Mobile Menu Toggle */}
@@ -113,7 +134,10 @@ const Navbar = () => {
               <MobileNavLink to="/inventory-dash" icon={<Package className="w-5 h-5" />} text="Inventory" />
               <MobileNavLink to="/all-products" icon={<ShoppingCart className="w-5 h-5" />} text="All Products" />
               <MobileNavLink to="/shopping-list" icon={<ShoppingCart className="w-5 h-5" />} text="Shopping List" />
-              <MobileNavLink to="/users" icon={<Users className="w-5 h-5" />} text="Users" />
+              {/* Only show User Management for admin and manager roles */}
+              {hasUserManagementAccess() && (
+                <MobileNavLink to="/users" icon={<Users className="w-5 h-5" />} text="Users" />
+              )}
               <MobileNavLink to="/ai-bot" icon={<Bot className="w-5 h-5" />} text="AI Assistant" />
               <MobileNavLink to="/settings" icon={<Settings className="w-5 h-5" />} text="Settings" />
               <MobileNavLink to="/logout" icon={<LogOut className="w-5 h-5" />} text="Logout" />
