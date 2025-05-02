@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Trash2, Loader2 } from 'lucide-react';
+import wasteApi from '../utils/wasteApi';
 
 const WasteLoggingForm: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -14,11 +15,12 @@ const WasteLoggingForm: React.FC = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [lastLoggedTime, setLastLoggedTime] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   // Validation logic
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
-    const today = new Date().toISOString().split('T')[0]; // Current date
+    const today = new Date().toISOString().split('T')[0];
 
     if (!formData.itemName.trim()) {
       newErrors.itemName = 'Item name is required.';
@@ -37,24 +39,31 @@ const WasteLoggingForm: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
       setIsSubmitting(true);
-      // Simulate API call
-      setTimeout(() => {
-        const submittedData = {
-          ...formData,
+      setSubmitError(null);
+      try {
+        const response = await wasteApi.post('/', {
+          itemName: formData.itemName,
+          category: formData.category,
           quantityDiscarded: parseFloat(formData.quantityDiscarded),
-          dateLogged: new Date().toISOString(),
-        };
-        console.log('Form submitted:', submittedData);
+          unit: formData.unit,
+          expirationDate: formData.expirationDate,
+          reason: formData.reason,
+        });
+        console.log('Form submitted:', response.data);
         setIsSubmitted(true);
         setLastLoggedTime(new Date().toLocaleTimeString());
-        setTimeout(() => setIsSubmitted(false), 3000); // Hide success after 3s
+        setTimeout(() => setIsSubmitted(false), 3000);
         resetForm();
+      } catch (err: any) {
+        console.error('Error submitting form:', err);
+        setSubmitError(err.response?.data?.msg || 'Failed to log waste item');
+      } finally {
         setIsSubmitting(false);
-      }, 1000); // 1-second delay to mimic network request
+      }
     }
   };
 
@@ -68,6 +77,7 @@ const WasteLoggingForm: React.FC = () => {
       reason: 'expired',
     });
     setErrors({});
+    setSubmitError(null);
   };
 
   // Auto-set unit based on category
@@ -100,6 +110,12 @@ const WasteLoggingForm: React.FC = () => {
           >
             <Trash2 className="h-5 w-5" />
           </button>
+        </div>
+      )}
+
+      {submitError && (
+        <div className="mb-4 p-3 bg-red-100 text-red-800 rounded-md">
+          {submitError}
         </div>
       )}
 
@@ -154,7 +170,7 @@ const WasteLoggingForm: React.FC = () => {
             <input
               type="date"
               required
-              max={new Date().toISOString().split('T')[0]} // Prevent future dates
+              max={new Date().toISOString().split('T')[0]}
               className={`w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 transition-all ${
                 errors.expirationDate ? 'border-red-500' : ''
               }`}
@@ -191,7 +207,7 @@ const WasteLoggingForm: React.FC = () => {
                   setErrors({ ...errors, quantityDiscarded: '' });
                 }}
                 disabled={isSubmitting}
-              />
+            />
               {errors.quantityDiscarded && (
                 <p className="mt-1 text-sm text-red-600">{errors.quantityDiscarded}</p>
               )}

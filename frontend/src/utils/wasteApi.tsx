@@ -1,21 +1,22 @@
 import axios from 'axios';
 
-const api = axios.create({
-  baseURL: 'http://localhost:8070/api/auth',
+const wasteApi = axios.create({
+  baseURL: 'http://localhost:8070/api/waste',
 });
 
-api.interceptors.request.use(config => {
+wasteApi.interceptors.request.use(config => {
   const token = localStorage.getItem('token');
-  console.log('Token attached to request:', token);
+  console.log('Waste API - Token attached to request:', token);
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
-    console.log('No token found in localStorage'); // Debug log
+  } else {
+    console.log('Waste API - No token found in localStorage');
   }
   return config;
 });
 
 // Interceptor to handle 401 errors (e.g., token expired)
-api.interceptors.response.use(
+wasteApi.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
@@ -27,6 +28,4 @@ api.interceptors.response.use(
   }
 );
 
-
-
-export default api;
+export default wasteApi;

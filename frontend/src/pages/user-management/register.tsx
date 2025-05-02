@@ -7,7 +7,7 @@ interface User {
   id: string;
   name: string;
   email: string;
-  role: 'admin' | 'manager' | 'staff' | 'housekeeping' | 'supplier';
+  role: 'admin' | 'manager' | 'staff' |  'supplier';
   status: 'active' | 'inactive';
   whatsapp?: string;
   inventory?: string[];
@@ -172,7 +172,7 @@ const RegisterPage: React.FC = () => {
                 className="mt-1 w-full rounded-md border-gray-300 focus:border-amber-500 focus:ring-amber-500 transition-all"
               >
                 <option value="staff">Staff</option>
-                <option value="housekeeping">Housekeeping</option>
+               
                 <option value="manager">Manager</option>
                 <option value="admin">Admin</option>
                 <option value="supplier">Supplier</option>

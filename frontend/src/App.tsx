@@ -11,7 +11,10 @@ import Login from './pages/user-management/login.tsx';
 import Register from './pages/user-management/register.tsx';
 import StaffManagement from './pages/user-management/StaffManagement.tsx';
 import Wastemanagement from './pages/user-management/waste-management.tsx';
-import InventoryLoggs from './pages/user-management/inventory-logs.tsx';
+
+
+
+
 
 function App() {
   return (
@@ -24,7 +27,7 @@ function App() {
             <Route path='/login' element={<Login/>}/>
             <Route path='/register' element={<Register/>}/>
             <Route path='/waste-management' element={<Wastemanagement/>}/>
-            <Route path='/inventory-logs' element={<InventoryLoggs/>}/>
+            
             <Route path='/inventory-dash' element={<InventoryDash/>}/>
             <Route path='/add-item' element={<AddItem/>}/>
             <Route path='/all-products' element={<AllProducts/>}/>
