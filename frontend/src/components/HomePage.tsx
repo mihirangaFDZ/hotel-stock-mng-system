@@ -1,7 +1,9 @@
 import React from 'react';
 import { TrendingUp, Package, Clock, Shield } from 'lucide-react';
+import { useNavigate } from "react-router-dom";
 
 const HomePage = () => {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
@@ -21,7 +23,8 @@ const HomePage = () => {
                 Streamline your hotel's inventory management with our comprehensive solution. 
                 Track supplies, manage stock levels, and optimize your operations effortlessly.
               </p>
-              <button className="bg-indigo-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-indigo-700 transition-colors">
+              <button className="bg-indigo-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-indigo-700 transition-colors"
+               onClick={() => navigate("/login")}>
                 Get Started
               </button>
             </div>

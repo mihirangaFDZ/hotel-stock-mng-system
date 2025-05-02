@@ -12,6 +12,11 @@ app.use(cors()); // Enable CORS for frontend
 // Routes
 const itemRoutes = require('./routes/itemRoutes');
 app.use('/', itemRoutes);
+// Routes
+app.use('/api/auth', require('./routes/user-managemnt/suppliers'));
+app.use('/api/auth', require('./routes/user-managemnt/auth'));
+app.use('/api/waste', require('./routes/user-managemnt/waste'));
+
 app.use("/api/purchases", require("./routes/shopping-list/purchaseRoutes")); // Corrected path
 app.use("/api/purchase-budget", require("./routes/shopping-list/purchaseBudgetRoutes")); // Corrected path
 app.use("/api/purchase-spending", require("./routes/shopping-list/purchaseSpendingRoutes")); // Corrected path
