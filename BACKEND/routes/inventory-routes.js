@@ -6,6 +6,8 @@ const inventory = require('../models/inventory-item');
 //routes and connect to the controllers
 router.post('/', invetoryController.addInventoryItem);
 router.get('/', invetoryController.getAllInventoryItems);
+router.get('/purchase-budget', invetoryController.getPurchaseBudgetData);
+router.get('/purchase-spending', invetoryController.getPurchaseSpendingData);
 router.get('/:id', invetoryController.getInventoryItemById);
 router.put('/:id', invetoryController.updateInventoryItem);
 router.delete('/:id', invetoryController.deleteInventoryItem);

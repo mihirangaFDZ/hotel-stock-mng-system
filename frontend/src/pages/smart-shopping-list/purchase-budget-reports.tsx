@@ -1,130 +1,54 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import { Download, RefreshCcw } from 'lucide-react';
 import { format } from 'date-fns';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
-// Initial mock data
-const initialBudgetData = [
-  { month: 'Jan', budget: 50000, spent: 45000 },
-  { month: 'Feb', budget: 50000, spent: 48000 },
-  { month: 'Mar', budget: 50000, spent: 52000 },
-  { month: 'Apr', budget: 55000, spent: 51000 },
-  { month: 'May', budget: 55000, spent: 53000 },
-  { month: 'Jun', budget: 55000, spent: 54000 },
-];
+interface BudgetData {
+  month: string;
+  budget: number;
+  spent: number;
+}
 
-const initialPurchasePatterns = [
-  { name: 'Vegetables', purchases: 150 },
-  { name: 'Meat', purchases: 120 },
-  { name: 'Dairy', purchases: 100 },
-  { name: 'Cleaning Supplies', purchases: 80 },
-  { name: 'Beverages', purchases: 90 },
-];
-
-// Department-specific mock data
-const departmentData = {
-  kitchen: {
-    budgetData: [
-      { month: 'Jan', budget: 30000, spent: 28000 },
-      { month: 'Feb', budget: 30000, spent: 29000 },
-      { month: 'Mar', budget: 30000, spent: 31000 },
-      { month: 'Apr', budget: 32000, spent: 30000 },
-      { month: 'May', budget: 32000, spent: 31000 },
-      { month: 'Jun', budget: 32000, spent: 32000 },
-    ],
-    purchasePatterns: [
-      { name: 'Vegetables', purchases: 100 },
-      { name: 'Meat', purchases: 90 },
-      { name: 'Dairy', purchases: 80 },
-      { name: 'Spices', purchases: 40 },
-      { name: 'Grains', purchases: 60 },
-    ],
-  },
-  housekeeping: {
-    budgetData: [
-      { month: 'Jan', budget: 15000, spent: 12000 },
-      { month: 'Feb', budget: 15000, spent: 14000 },
-      { month: 'Mar', budget: 15000, spent: 16000 },
-      { month: 'Apr', budget: 17000, spent: 15000 },
-      { month: 'May', budget: 17000, spent: 16000 },
-      { month: 'Jun', budget: 17000, spent: 16500 },
-    ],
-    purchasePatterns: [
-      { name: 'Cleaning Supplies', purchases: 70 },
-      { name: 'Linens', purchases: 50 },
-      { name: 'Toiletries', purchases: 60 },
-      { name: 'Room Amenities', purchases: 40 },
-      { name: 'Equipment', purchases: 20 },
-    ],
-  },
-  maintenance: {
-    budgetData: [
-      { month: 'Jan', budget: 10000, spent: 8000 },
-      { month: 'Feb', budget: 10000, spent: 9000 },
-      { month: 'Mar', budget: 10000, spent: 11000 },
-      { month: 'Apr', budget: 12000, spent: 11000 },
-      { month: 'May', budget: 12000, spent: 11500 },
-      { month: 'Jun', budget: 12000, spent: 11800 },
-    ],
-    purchasePatterns: [
-      { name: 'Tools', purchases: 30 },
-      { name: 'Spare Parts', purchases: 40 },
-      { name: 'Paint', purchases: 20 },
-      { name: 'Equipment', purchases: 15 },
-      { name: 'Safety Gear', purchases: 25 },
-    ],
-  },
-};
+interface PurchasePattern {
+  name: string;
+  purchases: number;
+}
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
-function reports() {
+function Reports() {
   const [dateRange, setDateRange] = useState('month');
-  const [department, setDepartment] = useState<'all' | 'kitchen' | 'housekeeping' | 'maintenance'>('all');
-  const [budgetData, setBudgetData] = useState(initialBudgetData);
-  const [purchasePatterns, setPurchasePatterns] = useState(initialPurchasePatterns);
+  const [department, setDepartment] = useState('all');
+  const [budgetData, setBudgetData] = useState<BudgetData[]>([]);
+  const [purchasePatterns, setPurchasePatterns] = useState<PurchasePattern[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const currentDate = new Date();
 
-  // Function to filter data based on date range
-  const filterDataByDateRange = (range: string) => {
-    let filteredBudgetData = [...initialBudgetData];
-    switch (range) {
-      case 'week':
-        filteredBudgetData = filteredBudgetData.slice(-1);
-        break;
-      case 'month':
-        filteredBudgetData = filteredBudgetData.slice(-3);
-        break;
-      case 'quarter':
-        filteredBudgetData = filteredBudgetData.slice(-4);
-        break;
-      case 'year':
-        // Use all data
-        break;
-      default:
-        break;
-    }
-    return filteredBudgetData;
-  };
-
-  // Update data when filters change
   useEffect(() => {
-    if (department === 'all') {
-      setBudgetData(filterDataByDateRange(dateRange));
-      setPurchasePatterns(initialPurchasePatterns);
-    } else {
-      setBudgetData(filterDataByDateRange(dateRange).map(item => ({
-        ...item,
-        budget: item.budget * 0.6,
-        spent: item.spent * 0.6,
-      })));
-      setPurchasePatterns(departmentData[department as keyof typeof departmentData].purchasePatterns);
-    }
+    fetchData();
   }, [dateRange, department]);
 
+  const fetchData = async () => {
+    setIsLoading(true);
+    try {
+      const [budgetRes, spendingRes] = await Promise.all([
+        axios.get(`http://localhost:8070/api/inventory/purchase-budget?range=${dateRange}&department=${department}`),
+        axios.get(`http://localhost:8070/api/inventory/purchase-spending?range=${dateRange}&department=${department}`)
+      ]);
+
+      setBudgetData(budgetRes.data);
+      setPurchasePatterns(spendingRes.data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      toast.error('Failed to fetch budget and spending data');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleExport = () => {
-    // Create CSV data
     const budgetCsv = [
       'Month,Budget,Spent',
       ...budgetData.map(item => `${item.month},${item.budget},${item.spent}`),
@@ -158,22 +82,7 @@ function reports() {
 
   const handleRefresh = async () => {
     setIsLoading(true);
-    // Simulate API call with setTimeout
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Randomly adjust the data to simulate refresh
-    const updatedBudgetData = budgetData.map(item => ({
-      ...item,
-      spent: item.spent * (0.95 + Math.random() * 0.1),
-    }));
-    
-    const updatedPurchasePatterns = purchasePatterns.map(item => ({
-      ...item,
-      purchases: Math.round(item.purchases * (0.95 + Math.random() * 0.1)),
-    }));
-
-    setBudgetData(updatedBudgetData);
-    setPurchasePatterns(updatedPurchasePatterns);
+    await fetchData();
     setIsLoading(false);
   };
 
@@ -207,7 +116,7 @@ function reports() {
             <select
               className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2"
               value={department}
-              onChange={(e) => setDepartment(e.target.value as 'all' | 'kitchen' | 'housekeeping' | 'maintenance')}
+              onChange={(e) => setDepartment(e.target.value)}
             >
               <option value="all">All Departments</option>
               <option value="kitchen">Kitchen</option>
@@ -335,4 +244,4 @@ function reports() {
   );
 }
 
-export default reports;
+export default Reports;

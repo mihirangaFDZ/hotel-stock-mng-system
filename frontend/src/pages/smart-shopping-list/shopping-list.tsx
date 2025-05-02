@@ -20,9 +20,21 @@ interface NewItem {
   currentStock: string;
 }
 
+// Define the InventoryItem interface for TypeScript
+interface InventoryItem {
+  _id: string;
+  itemName: string;
+  category: string;
+  quantity: number;
+  unitType: string;
+  department: string;
+  expiryDate?: string;
+}
+
 function ShoppingList() {
   const navigate = useNavigate();
   const [items, setItems] = useState<Item[]>([]);
+  const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
   const [newItem, setNewItem] = useState<NewItem>({
     name: '',
     threshold: '',
@@ -36,11 +48,30 @@ function ShoppingList() {
   });
   const [nameError, setNameError] = useState<string>(''); // State for name validation error
 
-  // Fetch items from backend on mount
+  // Fetch both shopping list and inventory items
   useEffect(() => {
-    axios.get<Item[]>('http://localhost:8070/api/shopping-list')
-      .then(response => setItems(response.data))
-      .catch(error => console.error('Error fetching items:', error));
+    const fetchData = async () => {
+      try {
+        const [shoppingListRes, inventoryRes] = await Promise.all([
+          axios.get<Item[]>('http://localhost:8070/api/shopping-list'),
+          axios.get<InventoryItem[]>('http://localhost:8070/api/inventory')
+        ]);
+        
+        setItems(shoppingListRes.data);
+        setInventoryItems(inventoryRes.data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        Swal.fire({
+          title: 'Error!',
+          text: 'Failed to fetch data. Please try again.',
+          icon: 'error',
+          confirmButtonText: 'OK',
+          confirmButtonColor: '#2563eb',
+        });
+      }
+    };
+
+    fetchData();
   }, []);
 
   const adjustQuantity = (id: string, increment: boolean) => {
@@ -106,6 +137,20 @@ function ShoppingList() {
       return;
     }
 
+    // Check if item exists in inventory
+    const inventoryItem = inventoryItems.find(item => item.itemName.toLowerCase() === newItem.name.toLowerCase());
+    
+    if (!inventoryItem) {
+      Swal.fire({
+        title: 'Warning!',
+        text: 'This item does not exist in the inventory. Please add it to inventory first.',
+        icon: 'warning',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#2563eb',
+      });
+      return;
+    }
+
     // Show sweetalert2 confirmation popup
     Swal.fire({
       title: 'Are you sure?',
@@ -122,7 +167,7 @@ function ShoppingList() {
         axios.post<Item>('http://localhost:8070/api/shopping-list', {
           name: newItem.name,
           threshold,
-          currentStock,
+          currentStock: inventoryItem.quantity, // Use inventory quantity as current stock
         })
           .then(response => {
             setItems([...items, response.data]);
@@ -222,18 +267,70 @@ function ShoppingList() {
               >
                 History
               </button>
-              <button
-                className="px-3 py-1 text-sm bg-purple-600 text-white rounded-md hover:bg-purple-700"
-                onClick={() => navigate('/reports')}
-              >
-                Reports
-              </button>
+              
             </div>
           </div>
         </div>
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        {/* Add Inventory Items Section */}
+        <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-xl hover-scale transition-all duration-300">
+          <div className="px-6 py-8">
+            <div className="flex items-center space-x-3 mb-6">
+              <Package2 className="h-6 w-6 text-blue-600" />
+              <h3 className="text-xl font-semibold text-gray-900">Available Inventory Items</h3>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50/80">
+                  <tr>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item Name</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expiry Date</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white/80 divide-y divide-gray-200">
+                  {inventoryItems.map((item) => (
+                    <tr key={item._id} className="hover:bg-gray-50/80 transition-colors duration-150">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.itemName}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                          {item.category}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {item.quantity} {item.unitType}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.department}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {item.expiryDate ? new Date(item.expiryDate).toLocaleDateString() : 'N/A'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <button
+                          onClick={() => {
+                            setNewItem({
+                              name: item.itemName,
+                              threshold: '5', // Default threshold
+                              currentStock: item.quantity.toString()
+                            });
+                          }}
+                          className="text-blue-600 hover:text-blue-900 font-medium"
+                        >
+                          Add to Shopping List
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
         {/* Add New Item Form */}
         <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-xl hover-scale transition-all duration-300">
           <div className="px-6 py-8">
@@ -308,7 +405,7 @@ function ShoppingList() {
           <div className="px-6 py-8">
             <div className="sm:flex sm:items-center sm:justify-between mb-8">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">Auto-generated Shopping List</h2>
+                <h2 className="text-2xl font-bold text-gray-900">Shopping List</h2>
                 <p className="mt-2 text-sm text-gray-600">
                   Items that need to be restocked based on current inventory levels and thresholds.
                 </p>
