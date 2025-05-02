@@ -5,22 +5,22 @@ import InventoryDash from './pages/inventory/inventory-dash.tsx';
 import AddItem from './pages/inventory/add-item.tsx';
 import AllProducts from './pages/inventory/all-products.tsx';
 import ShoppingList from './pages/smart-shopping-list/shopping-list.tsx';
-import PushaseSpending from './pages/smart-shopping-list/purchase-spending.tsx';
+import PurchaseSpending from './pages/smart-shopping-list/purchase-spending.tsx';
 import Reports from './pages/smart-shopping-list/purchase-budget-reports.tsx';
 import Login from './pages/user-management/login.tsx';
 import Register from './pages/user-management/register.tsx';
 import StaffManagement from './pages/user-management/StaffManagement.tsx';
 import Wastemanagement from './pages/user-management/waste-management.tsx';
-
-
-
-
+import { ToastContainer } from 'react-toastify';
+import Breadcrumb from './components/Breadcrumb.tsx';
 
 function App() {
   return (
     <Router>
       <div className="min-h-screen bg-gray-50">
-        <Navbar />
+        <Navbar /> 
+        <ToastContainer position="top-right" autoClose={3000} />
+        <Breadcrumb />
         <div className="max-w-7xl mx-auto px-4 py-6">
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -32,7 +32,7 @@ function App() {
             <Route path='/add-item' element={<AddItem/>}/>
             <Route path='/all-products' element={<AllProducts/>}/>
             <Route path='/shopping-list' element={<ShoppingList/>}/>
-            <Route path='/pushase-spending' element={<PushaseSpending/>}/>
+            <Route path='/pushase-spending' element={<PurchaseSpending/>}/>
             <Route path='/reports' element={<Reports/>}/>
             <Route path='/waste-management' element={<Wastemanagement/>}/>
             <Route path="/staff-management" element={<ProtectedRoute component={StaffManagement} />} />
