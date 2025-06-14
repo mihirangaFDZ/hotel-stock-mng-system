@@ -67,8 +67,8 @@ const StaffManagement: React.FC = () => {
 
   const fetchSuppliers = useCallback(async () => {
     try {
-      console.log('Fetching suppliers from: http://localhost:8070/api/suppliers');
-      const response = await api.get<Supplier[]>('/suppliers', { baseURL: 'http://localhost:8070/api/auth' });
+      console.log('Fetching suppliers from: http://localhost:8070/api/auth/suppliers');
+      const response = await api.get<Supplier[]>('/suppliers');
       console.log('Suppliers fetched:', response.data);
       setSuppliers(response.data);
       toast.success('Suppliers fetched successfully', { autoClose: 3000 });
@@ -150,7 +150,7 @@ const StaffManagement: React.FC = () => {
 
     try {
       console.log('Adding supplier:', { name, email, whatsapp, items });
-      const response = await api.post<{ msg: string; supplier: Supplier }>('auth/suppliers', { name, email, whatsapp, items }, { baseURL: 'http://localhost:8070/api' });
+      const response = await api.post<{ msg: string; supplier: Supplier }>('/suppliers', { name, email, whatsapp, items });
       console.log('Add supplier response:', response.data);
       setSuppliers(prev => [...prev, response.data.supplier]);
       setModalState(prev => ({ ...prev, addSupplier: false }));
@@ -217,7 +217,7 @@ const StaffManagement: React.FC = () => {
 
     try {
       console.log('Editing supplier:', selectedSupplier._id, updatedSupplier);
-      const response = await api.put<{ msg: string; supplier: Supplier }>(`auth/suppliers/${selectedSupplier._id}`, updatedSupplier, { baseURL: 'http://localhost:8070/api' });
+      const response = await api.put<{ msg: string; supplier: Supplier }>(`/suppliers/${selectedSupplier._id}`, updatedSupplier);
       console.log('Edit supplier response:', response.data);
       setSuppliers(prev => prev.map(supplier => supplier._id === selectedSupplier._id ? response.data.supplier : supplier));
       setModalState(prev => ({ ...prev, editSupplier: false }));
@@ -244,7 +244,7 @@ const StaffManagement: React.FC = () => {
         toast.success(`User ${selectedUser.name} deleted successfully`, { autoClose: 3000 });
       } else if (selectedSupplier) {
         console.log('Deleting supplier:', selectedSupplier._id);
-        await api.delete(`/suppliers/${selectedSupplier._id}`, { baseURL: 'http://localhost:8070/api/auth' });
+        await api.delete(`/suppliers/${selectedSupplier._id}`);
         console.log('Supplier deleted successfully');
         setSuppliers(prev => prev.filter(supplier => supplier._id !== selectedSupplier._id));
         toast.success(`Supplier ${selectedSupplier.name} deleted successfully`, { autoClose: 3000 });

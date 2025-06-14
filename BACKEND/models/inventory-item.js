@@ -19,18 +19,34 @@ const inventoryItemSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  location: {
+  department: {
     type: String,
     required: true,
   },
   expiryDate: {
     type: Date,
+  },
+  price: {
+    type: Number,
     required: true,
+    min: 0,
+  },
+  currency: {
+    type: String,
+    required: true,
+  },
+  threshold: {
+    type: Number,
+    required: true,
+    min: 0,
   },
   updatedAt: {
     type: Date,
     default: Date.now,
   },
+  lastDailyUsageUpdate: { type: Date },
+
+
 });
 
 inventoryItemSchema.pre("save", function (next) {

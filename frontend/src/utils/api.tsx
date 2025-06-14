@@ -6,10 +6,11 @@ const api = axios.create({
 
 api.interceptors.request.use(config => {
   const token = localStorage.getItem('token');
-  console.log('Token attached to request:', token);
   if (token) {
+    console.log('Token attached to request:', token);
     config.headers.Authorization = `Bearer ${token}`;
-    console.log('No token found in localStorage'); // Debug log
+  } else {
+    console.log('No token found in localStorage');
   }
   return config;
 });

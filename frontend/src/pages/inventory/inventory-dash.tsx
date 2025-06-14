@@ -17,6 +17,7 @@ interface InventoryItem {
   department: string;
   expiryDate?: string;
   updatedAt?: string;
+  threshold: number;
   price?: number;
 }
 
@@ -25,7 +26,7 @@ interface CategoryData {
   value: number;
 }
 
-interface MonthlyUsageData {
+interface InventoryValue {
   month: string;
   groceries: number;
   electronics: number;
@@ -41,10 +42,10 @@ const InventoryDash: React.FC = () => {
 
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [categoryData, setCategoryData] = useState<CategoryData[]>([]);
-  const [monthlyUsage, setMonthlyUsage] = useState<MonthlyUsageData[]>([]);
+  const [monthlyUsage, setMonthlyUsage] = useState<InventoryValue[]>([]);
   const [totalProducts, setTotalProducts] = useState(0);
   const [totalCategories, setTotalCategories] = useState(0);
-  const [monthlySpending, setMonthlySpending] = useState(0);
+  const [inventoryValue, setInventoryValue] = useState(0);
   const [lowStockItems, setLowStockItems] = useState(0);
 
   useEffect(() => {
@@ -61,16 +62,19 @@ const InventoryDash: React.FC = () => {
         const uniqueCategories = new Set(inventoryData.map((item) => item.category));
         setTotalCategories(uniqueCategories.size);
 
+        // Calculate total inventory value from ALL items, not just current month
+        const totalValue = inventoryData.reduce((total, item) => total + item.quantity * (item.price || 100), 0);
+        setInventoryValue(totalValue);
+
+        // Keep the monthly filtering for other purposes
         const currentMonth = new Date().toLocaleString("default", { month: "long", year: "numeric" });
         const monthlyItems = inventoryData.filter((item) => {
           if (!item.updatedAt) return false;
           const itemDate = new Date(item.updatedAt);
           return itemDate.toLocaleString("default", { month: "long", year: "numeric" }) === currentMonth;
         });
-        const spending = monthlyItems.reduce((total, item) => total + item.quantity * (item.price || 100), 0);
-        setMonthlySpending(spending);
 
-        const lowStockCount = inventoryData.filter((item) => item.quantity < 5).length;
+        const lowStockCount = inventoryData.filter((item) => item.quantity < item.threshold).length;
         setLowStockItems(lowStockCount);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -149,15 +153,15 @@ const InventoryDash: React.FC = () => {
         </a>
         <a href="#" className="bg-white shadow-lg rounded-lg p-6 hover:shadow-xl transition">
           <DollarSign className="h-8 w-8 text-green-600 mb-2" />
-          <h2 className="text-xl font-semibold">Monthly Spending</h2>
-          <p className="text-gray-600">{monthlySpending} LKR</p>
+          <h2 className="text-xl font-semibold">Inventory Value</h2>
+          <p className="text-gray-600">{inventoryValue.toLocaleString()} LKR</p>
         </a>
-        <a href="#" className="bg-white shadow-lg rounded-lg p-6 hover:shadow-xl transition">
+        <a href="/low-stock" className="bg-white shadow-lg rounded-lg p-6 hover:shadow-xl transition">
           <AlertTriangle className="h-8 w-8 text-red-600 mb-2" />
           <h2 className="text-xl font-semibold">Low Stock Items</h2>
           <p className="text-gray-600">{lowStockItems} items</p>
         </a>
-        <a href="#" className="bg-white shadow-lg rounded-lg p-6 hover:shadow-xl transition">
+        <a href="/categories" className="bg-white shadow-lg rounded-lg p-6 hover:shadow-xl transition">
           <Tag className="h-8 w-8 text-yellow-600 mb-2" />
           <h2 className="text-xl font-semibold">All Categories</h2>
           <p className="text-gray-600">{totalCategories} categories</p>

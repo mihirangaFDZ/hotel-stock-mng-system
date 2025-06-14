@@ -33,8 +33,8 @@ export interface InventoryLog {
     id: string;
     name: string;
     email: string;
-    password: string; // Add this
-    role: 'staff' | 'manager' | 'admin' | 'supplier';
+    password: string; 
+    role: 'staff' | 'manager' | 'admin' | 'supplier' | 'housekeeping';
     status: 'active' | 'inactive';
     whatsapp?: string;
     inventory?: string[];
@@ -45,7 +45,6 @@ export interface InventoryLog {
     isAuthenticated: boolean;
     currentUser: User | null;
   }
-  
- 
 
-  
+
+

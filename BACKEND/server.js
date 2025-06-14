@@ -6,28 +6,45 @@ const dotenv = require('dotenv');
 dotenv.config();
 const app = express();
 
+//middleware
 app.use(express.json()); // Parse JSON requests
 app.use(cors()); // Enable CORS for frontend
 
 // Routes
 const itemRoutes = require('./routes/itemRoutes');
-app.use('/', itemRoutes);
-// Routes
-app.use('/api/auth', require('./routes/user-managemnt/suppliers'));
-app.use('/api/auth', require('./routes/user-managemnt/auth'));
-app.use('/api/waste', require('./routes/user-managemnt/waste'));
-
-app.use("/api/purchases", require("./routes/shopping-list/purchaseRoutes")); // Corrected path
-app.use("/api/purchase-budget", require("./routes/shopping-list/purchaseBudgetRoutes")); // Corrected path
-app.use("/api/purchase-spending", require("./routes/shopping-list/purchaseSpendingRoutes")); // Corrected path
-app.use("/api/shopping-list", require("./routes/shopping-list/shoppingListRoutes")); // Corrected path
+const inventoryRoutes = require('./routes/inventory-routes');
+// app.use('/', itemRoutes);
+app.use('/api/inventory', inventoryRoutes);
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('MongoDB Connected Menda...'))
-  .catch(err => console.log(err));
+mongoose.connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
+.then(() => console.log('MongoDB Connected.'))
+.catch(err => console.log(err));
 
 const PORT = process.env.PORT || 8070;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+//breadcrumb
+const ProductSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  category: { type: String, required: true },
+});
+const Product = mongoose.model('Product', ProductSchema);
+
+app.get('/api/breadcrumb/:id', async (req, res) => {
+  const product = await Product.findById(req.params.id);
+  if (!product) return res.status(404).send('Product not found');
+  res.json({
+    path: [
+      { name: 'Home', url: '/' },
+      { name: product.category, url: '/products' },
+      { name: product.name, url: `/products/${product._id}` },
+    ],
+  });
+});
+

@@ -1,21 +1,9 @@
-import {
-    ArrowUpDown,
-    Check,
-
-    Edit,
-    Filter,
-    Package,
-    Plus,
-    Search,
-    Trash2,
-} from "lucide-react";
+import { ArrowUpDown, Filter, Package, Search } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-import InventoryReport from "./../../components/InventoryReport";
 
-//#region Constants and Configuration
+// Constants and Configuration
 const API_URL = "http://localhost:8070/api/inventory/";
 
 const CATEGORIES = [
@@ -26,11 +14,18 @@ const CATEGORIES = [
     "Electronics",
     "Food",
 ];
-const DEPARTMENTS = ['All','Kitchen', 'House Keeping', 'Maintenance'];
+const DEPARTMENTS = [
+    "All",
+    "Kitchen Cabinet",
+    "Under Sink",
+    "Laundry Room",
+    "Utility Drawer",
+    "Storage Closet",
+    "Bathroom",
+    "Bathroom Cabinet",
+];
 
-//#endregion
-
-//#region Types
+// Types
 interface InventoryItem {
     _id: string;
     itemName: string;
@@ -40,6 +35,10 @@ interface InventoryItem {
     department: string;
     expiryDate?: string;
     updatedAt?: string;
+    lastDailyUsageUpdate?: string;
+    price: number;
+    currency: string;
+    threshold: number;
 }
 
 interface Message {
@@ -47,15 +46,8 @@ interface Message {
     text: string;
 }
 
-interface DailyUsage {
-    [key: string]: number;
-}
-//#endregion
-
-const AllProducts: React.FC = () => {
-    const navigate = useNavigate();
-
-    //#region State
+const LowStockItems: React.FC = () => {
+    // State
     const [inventory, setInventory] = useState<InventoryItem[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("All");
@@ -63,86 +55,33 @@ const AllProducts: React.FC = () => {
     const [sortField, setSortField] = useState<keyof InventoryItem>("itemName");
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
     const [loading, setLoading] = useState(false);
-    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-    const [itemToDelete, setItemToDelete] = useState<string | null>(null);
     const [message, setMessage] = useState<Message | null>(null);
-    const [dailyUsage, setDailyUsage] = useState<DailyUsage>({});
-    //#endregion
 
-    //#region Effects
+    // Effects
     useEffect(() => {
         fetchInventory();
     }, []);
-    //#endregion
 
-    //#region API Calls
+    // API Calls
     const fetchInventory = async () => {
         setLoading(true);
         try {
             const response = await axios.get<InventoryItem[]>(API_URL);
-            setInventory(response.data);
-        } catch (err) {
-            setMessage({ type: "error", text: "Failed to fetch inventory" });
-            console.error("Error fetching inventory:", err);
-            toast.error("Failed to fetch inventory");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleDeleteItem = async () => {
-        if (!itemToDelete) return;
-
-        setLoading(true);
-        try {
-            await axios.delete(`${API_URL}${itemToDelete}`);
-            setInventory(inventory.filter((item) => item._id !== itemToDelete));
-            toast.success("Item deleted successfully");
-        } catch (err) {
-            setMessage({ type: "error", text: "Failed to delete item" });
-            console.error("Error deleting item:", err);
-            toast.error("Failed to delete item");
-        } finally {
-            setShowDeleteDialog(false);
-            setItemToDelete(null);
-            setLoading(false);
-        }
-    };
-
-    const handleUpdateDailyUsage = async (item: InventoryItem) => {
-        const usage = dailyUsage[item._id] || 0;
-
-        // Validation
-        if (usage <= 0) {
-            toast.error("Daily usage must be greater than 0");
-            return;
-        }
-        if (usage > item.quantity) {
-            toast.error("Daily usage cannot exceed current quantity");
-            return;
-        }
-
-        setLoading(true);
-        try {
-            const updatedQuantity = item.quantity - usage;
-            const updatedItem = { ...item, quantity: updatedQuantity };
-
-            const response = await axios.put(`${API_URL}${item._id}`, updatedItem);
-            setInventory(
-                inventory.map((i) => (i._id === item._id ? response.data : i))
+            // Filter for low stock items (quantity < threshold)
+            const lowStockItems = response.data.filter(
+                (item) => item.quantity < item.threshold
             );
-            setDailyUsage((prev) => ({ ...prev, [item._id]: 0 })); // Reset usage input
-            toast.success(`Updated daily usage for ${item.itemName}`);
+            setInventory(lowStockItems);
         } catch (err) {
-            console.error("Error updating daily usage:", err);
-            toast.error("Failed to update daily usage");
+            setMessage({ type: "error", text: "Failed to fetch low stock items" });
+            console.error("Error fetching inventory:", err);
+            toast.error("Failed to fetch low stock items");
         } finally {
             setLoading(false);
         }
     };
-    //#endregion
 
-    //#region Handlers
+    // Handlers
     const handleSort = (field: keyof InventoryItem) => {
         setSortField(field);
         setSortDirection((prev) =>
@@ -162,16 +101,7 @@ const AllProducts: React.FC = () => {
         setSelectedDepartment(e.target.value);
     };
 
-    const handleDailyUsageChange = (
-        itemId: string,
-        e: React.ChangeEvent<HTMLInputElement>
-    ) => {
-        const value = parseInt(e.target.value) || 0;
-        setDailyUsage((prev) => ({ ...prev, [itemId]: value }));
-    };
-    //#endregion
-
-    //#region Filter and Sort Logic
+    // Filter and Sort Logic
     const filteredInventory = inventory
         .filter(
             (item) =>
@@ -196,9 +126,8 @@ const AllProducts: React.FC = () => {
                 ? Number(aValue) - Number(bValue)
                 : Number(bValue) - Number(aValue);
         });
-    //#endregion
 
-    //#region Render
+    // Render
     return (
         <div className="container mx-auto px-4 py-6 fade-in">
             {/* Message Toast */}
@@ -217,19 +146,8 @@ const AllProducts: React.FC = () => {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
                 <h1 className="text-3xl font-bold text-gray-800 mb-4 md:mb-0">
-                    Inventory Management
+                    Low Stock Items
                 </h1>
-                <div className="flex space-x-2">
-                    <InventoryReport inventory={filteredInventory} />
-                    <button
-                        onClick={() => navigate("/add-item")}
-                        className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 flex items-center transition shadow-sm"
-                        disabled={loading}
-                    >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add New Item
-                    </button>
-                </div>
             </div>
 
             {/* Filters */}
@@ -280,7 +198,7 @@ const AllProducts: React.FC = () => {
                     </div>
 
                     <div className="text-right text-gray-500">
-                        {filteredInventory.length} items found
+                        {filteredInventory.length} low stock items found
                     </div>
                 </div>
             </div>
@@ -299,31 +217,25 @@ const AllProducts: React.FC = () => {
                                             "itemName",
                                             "category",
                                             "quantity",
+                                            "threshold",
+                                            "unitType",
                                             "department",
                                             "expiryDate",
-                                            "dailyUsage",
                                         ].map((field) => (
                                             <th
                                                 key={field}
                                                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                                                onClick={
-                                                    field !== "dailyUsage"
-                                                        ? () => handleSort(field as keyof InventoryItem)
-                                                        : undefined
-                                                }
+                                                onClick={() => handleSort(field as keyof InventoryItem)}
                                             >
                                                 <div className="flex items-center">
                                                     {field.charAt(0).toUpperCase() +
                                                         field.slice(1).replace("Date", " Date")}
-                                                    {field !== "dailyUsage" && sortField === field && (
+                                                    {sortField === field && (
                                                         <ArrowUpDown className="h-4 w-4 ml-1" />
                                                     )}
                                                 </div>
                                             </th>
                                         ))}
-                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Actions
-                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
@@ -338,7 +250,13 @@ const AllProducts: React.FC = () => {
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {item.quantity} {item.unitType}
+                                                {item.quantity}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                {item.threshold}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                {item.unitType}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                                 {item.department}
@@ -348,48 +266,6 @@ const AllProducts: React.FC = () => {
                                                     ? new Date(item.expiryDate).toLocaleDateString()
                                                     : "N/A"}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                <div className="flex items-center space-x-2">
-                                                    <input
-                                                        type="number"
-                                                        min="0"
-                                                        value={dailyUsage[item._id] || ""}
-                                                        onChange={(e) => handleDailyUsageChange(item._id, e)}
-                                                        className="w-20 px-2 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                        placeholder="0"
-                                                        disabled={loading}
-                                                    />
-                                                   
-                                                    <button
-                                                        onClick={() => handleUpdateDailyUsage(item)}
-                                                        className="text-indigo-600 hover:text-indigo-900  mr-3 rounded-lg px-3 py-1 text-sm border border-gray-300"
-                                                        disabled={loading}
-                                                    >
-                                                       <Check className="h-4 w-4 " />
-
-                                                    </button>
-                                                  
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                <button
-                                                    className="text-indigo-600 hover:text-indigo-900 mr-3"
-                                                    onClick={() => navigate(`/update-item/${item._id}`)}
-                                                    disabled={loading}
-                                                >
-                                                    <Edit className="h-4 w-4" />
-                                                </button>
-                                                <button
-                                                    className="text-red-600 hover:text-red-900"
-                                                    onClick={() => {
-                                                        setItemToDelete(item._id);
-                                                        setShowDeleteDialog(true);
-                                                    }}
-                                                    disabled={loading}
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                </button>
-                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -397,43 +273,14 @@ const AllProducts: React.FC = () => {
                         </div>
                         {filteredInventory.length === 0 && (
                             <div className="text-center py-8 text-gray-500">
-                                No items found. Try adjusting your filters or add new items.
+                                No low stock items found. All items are above their threshold.
                             </div>
                         )}
                     </>
                 )}
             </div>
-
-            {/* Delete Confirmation Dialog */}
-            {showDeleteDialog && (
-                <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
-                    <div className="bg-white rounded-lg p-6 max-w-sm w-full">
-                        <h3 className="text-lg font-medium mb-4">Confirm Deletion</h3>
-                        <p className="text-gray-600 mb-6">
-                            Are you sure you want to delete this item?
-                        </p>
-                        <div className="flex justify-end space-x-4">
-                            <button
-                                className="px-4 py-2 text-gray-600 hover:text-gray-800"
-                                onClick={() => setShowDeleteDialog(false)}
-                                disabled={loading}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-                                onClick={handleDeleteItem}
-                                disabled={loading}
-                            >
-                                {loading ? "Deleting..." : "Delete"}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
-    //#endregion
 };
 
-export default AllProducts;
+export default LowStockItems;
