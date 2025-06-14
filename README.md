@@ -42,7 +42,7 @@ Managing hotel stock can be complex — from tracking inventory across departmen
 
 | Dashboard | Inventory List | Add Item Form |
 |----------|----------------|----------------|
-| ![Dashboard](./Screenshots/dashboard.png) | ![Inventory](./Screenshots/inventory.png) | ![Add Item](./Screenshots/add-item.png) |
+| ![Dashboard](./screenshots/dashboard.png) | ![Inventory](./screenshots/inventory.png) | ![Add Item](./screenshots/add-item.png) |
 
 ## 🧑‍💻 How to Run Locally
 
@@ -75,11 +75,9 @@ Admin Login:
 Email: admin@hotel.com
 Password: admin123
 📌 Folder Structure
-pgsql
-Copy
-Edit
-hotel-stock-mng-system/
-├── backend/
+
+hotel-stock-mng-system/<br>
+├── backend/<br>
 │   ├── controllers/        
 │   ├── models/             
 │   ├── routes/             
@@ -87,29 +85,44 @@ hotel-stock-mng-system/
 │   │   └── auth.js         
 │   ├── utils/              
 │   └── server.js          
-├── frontend/
+├── frontend/<br>
 │   ├── components/         
 │   ├── pages/              
 │   ├── services/          
 │   └── App.js            
 └── README.md
 
+## 👥 Contributors
+
+| Name | Role | GitHub |
+|------|------|--------|
+| **Mihiranga Fernando** | Full-Stack Developer / Project Lead | [@mihirangafdz](https://github.com/mihirangafdz) |
+| **Imeth Mendis** | Full-Stack Developer | [@IT22350732](https://github.com/IT22350732) |
+| **Venuka Sirimanne** | Full-Stack Developer | [@Siri200211](https://github.com/Siri200211) |
+| **Dakshina Rajapakshe** | Full-Stack Developer | [@dakshinavr](https://github.com/dakshinavr) |
+
+
+> Special thanks to everyone who contributed their time and effort to make this project successful!
+
+
+To all contributors: Thank you for your valuable time, ideas, and effort 👏
 
 💡 Lessons Learned
-CRUD operations with RESTful APIs
 
-JWT-based user authentication and role access
+      CRUD operations with RESTful APIs
 
-State management and form handling in React
+      JWT-based user authentication and role access
 
-Real-time UI updates with Axios and useEffect
+      State management and form handling in React
 
-Reusable component architecture
+      Real-time UI updates with Axios and useEffect
+
+      Reusable component architecture
 
 📬 Contact
-Mihiranga Fernando
-📧 mihirangafdz@gmail.com
-🌐 LinkedIn www.linkedin.com/in/mihiranga-fernando
+        Mihiranga Fernando
+        📧 mihirangafdz@gmail.com
+        🌐 LinkedIn www.linkedin.com/in/mihiranga-fernando
 
 ⭐ Acknowledgements
-Special thanks to my academic mentors, peers, and the SLIIT community for support and feedback during development.
+- Special thanks to my academic mentors, peers, and the SLIIT community for support and feedback during development.
